@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero Trust Gap Analysis Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Zero Trust Gap Analysis Tool</h1>
+            <p>RMF 800-53 Compliance Assessment & ZT Controls Mapping</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Step 1: Agency Management -->
+            <div class="step">
+                <h3>Step 1: Agency Management</h3>
+                <div class="agency-management">
+                    <div class="form-group">
+                        <label for="newAgency">Add New Agency:</label>
+                        <div class="input-group">
+                            <input type="text" id="newAgency" placeholder="Enter agency name">
+                            <button id="addAgencyBtn" class="btn btn-secondary">Add Agency</button>
+                            <button id="editAgencyBtn" class="btn btn-secondary">Edit Agency</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencySelect">Select Agency:</label>
+                        <select id="agencySelect">
+                            <option value="">-- Select Agency --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Overlay Selection -->
+            <div class="step">
+                <h3>Step 2: Zero Trust Control Type</h3>
+                <div class="form-group">
+                    <label>Are you evaluating Target or Advanced ZT Controls?</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="target" name="overlay" value="target">
+                            <label for="target">Target ZT Controls</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="advanced" name="overlay" value="advanced">
+                            <label for="advanced">Advanced ZT Controls</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: File Upload -->
+            <div class="step">
+                <h3>Step 3: Upload RMF Assessment File</h3>
+                <div class="form-group">
+                    <label for="csvFile">Upload your RMF 800-53 CSV file:</label>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <input type="file" id="csvFile" accept=".csv" />
+                        <div class="upload-text">
+                            <p>📄 Click to select or drag & drop your CSV file</p>
+                            <small>Expected format: Column A = Control ID, Column B = Status</small>
+                        </div>
+                    </div>
+                    <div id="fileInfo" class="file-info" style="display: none;"></div>
+                </div>
+                
+                <!-- CSV Format Guide -->
+                <div class="format-guide">
+                    <h4>📋 Expected CSV Format:</h4>
+                    <div class="format-example">
+                        <code>
+                            Control ID,Status<br>
+                            AC-1,Compliant<br>
+                            AC-2,Non-compliant<br>
+                            AC-3,Inherited<br>
+                            AU-2,N/A
+                        </code>
+                    </div>
+                    <p><strong>Valid Status Values:</strong> Compliant, Non-compliant, Inherited, N/A</p>
+                </div>
+            </div>
+            
+            <!-- Step 4: Additional Questions -->
+            <div class="step" id="additionalQuestionsStep" style="display: none;">
+                <h3>Step 4: Additional Assessment Questions</h3>
+                <div id="additionalQuestions" class="questions-container">
+                    <!-- Questions will be populated dynamically -->
+                </div>
+            </div>
+            
+            <!-- Step 5: Process Assessment -->
+            <div class="step">
+                <h3 id="processStepTitle">Step 4: Process Assessment</h3>
+                <div class="process-section">
+                    <button id="processBtn" class="btn btn-primary" disabled>
+                        <span id="btnText">🔄 Process Assessment</span>
+                    </button>
+                    <div id="loading" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Processing your assessment...</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="error" class="error" style="display: none;"></div>
+            </div>
+            
+            <!-- Results Section -->
+            <div id="results" class="results">
+                <h3>📊 Compliance Assessment Results</h3>
+                
+                <!-- Summary Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card compliant-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-number" id="compliantCount">0</div>
+                        <div class="stat-label">Compliant</div>
+                        <div class="stat-percentage" id="compliantPercent">0%</div>
+                    </div>
+                    <div class="stat-card non-compliant-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-number" id="nonCompliantCount">0</div>
+                        <div class="stat-label">Non-Compliant</div>
+                        <div class="stat-percentage" id="nonCompliantPercent">0%</div>
+                    </div>
+                    <div class="stat-card inherited-card">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-number" id="inheritedCount">0</div>
+                        <div class="stat-label">Inherited</div>
+                        <div class="stat-percentage" id="inheritedPercent">0%</div>
+                    </div>
+                    <div class="stat-card na-card">
+                        <div class="stat-icon">➖</div>
+                        <div class="stat-number" id="naCount">0</div>
+                        <div class="stat-label">N/A</div>
+                        <div class="stat-percentage" id="naPercent">0%</div>
+                    </div>
+                </div>
+                
+                <!-- Overall Compliance Score -->
+                <div class="compliance-score">
+                    <h4>Overall Compliance Score</h4>
+                    <div class="score-display">
+                        <div class="score-circle" id="scoreCircle">
+                            <span id="overallScore">0%</span>
+                        </div>
+                        <div class="score-details">
+                            <p id="scoreDescription">Compliance calculation includes Compliant + Inherited controls</p>
+                            <p id="scoreBreakdown"><span id="effectiveCompliant">0</span> out of <span id="effectiveTotal">0</span> controls</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visualization Charts -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h4>Compliance Distribution</h4>
+                        <canvas id="complianceChart" width="400" height="200"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h4>Control Family Breakdown</h4>
+                        <canvas id="familyChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Detailed Analysis -->
+                <div class="detailed-analysis">
+                    <h4>📋 Detailed Control Analysis</h4>
+                    <div class="analysis-filters">
+                        <button class="filter-btn active" data-filter="all">All Controls</button>
+                        <button class="filter-btn" data-filter="non-compliant">Non-Compliant Only</button>
+                        <button class="filter-btn" data-filter="gaps">Critical Gaps</button>
+                    </div>
+                    <div id="controlsList" class="controls-list">
+                        <!-- Control details will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Export Options -->
+                <div class="export-section">
+                    <h4>📤 Export Results</h4>
+                    <div class="export-buttons">
+                        <button id="exportRawBtn" class="btn btn-export">📄 Raw Data CSV</button>
+                        <button id="exportAdjustedBtn" class="btn btn-export">🔧 Adjusted Data CSV</button>
+                        <button id="exportComparisonBtn" class="btn btn-export">📊 Comparison Analysis CSV</button>
+                        <button id="exportComplianceBtn" class="btn btn-export">📈 Compliance Summary CSV</button>
+                        <button id="exportChartsBtn" class="btn btn-export">📊 Charts HTML</button>
+                        <button id="exportAllBtn" class="btn btn-primary">📦 Export All Files</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Additional Questions -->
+    <div id="questionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Additional Assessment Question</h3>
+            <div id="modalQuestionContent"></div>
+            <div class="modal-actions">
+                <button id="modalSaveBtn" class="btn btn-primary">Save Answer</button>
+                <button id="modalSkipBtn" class="btn btn-secondary">Skip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Edit Agency -->
+    <div id="editAgencyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="editModalClose">&times;</span>
+            <h3>Edit Agency</h3>
+            <div class="form-group">
+                <label for="editAgencySelect">Select Agency to Edit:</label>
+                <select id="editAgencySelect">
+                    <option value="">-- Select Agency to Edit --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editAgencyName">New Agency Name:</label>
+                <input type="text" id="editAgencyName" placeholder="Enter new agency name">
+            </div>
+            <div class="modal-actions">
+                <button id="saveEditBtn" class="btn btn-primary">Save Changes</button>
+                <button id="deleteAgencyBtn" class="btn" style="background: #dc3545;">Delete Agency</button>
+                <button id="cancelEditBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
