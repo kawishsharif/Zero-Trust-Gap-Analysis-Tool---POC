@@ -127,10 +127,41 @@ const ADDITIONAL_QUESTIONS = {
 // Global Variables
 let agencies = ['NASA', 'IQVIA', 'CDC', 'State of Texas', 'MITRE'];
 let uploadedData = null;
+let originalData = null; // Store original data before adjustments
 let processedResults = null;
 let additionalAnswers = {};
 let complianceChart = null;
 let familyChart = null;
+let pillarChart = null; // For Zero Trust pillars chart
+let adjustmentComments = {}; // Store comments for adjustments
+
+// Zero Trust to RMF Control Mapping
+const ZT_TO_RMF_MAPPING = {
+    // This is a simplified example - in production, this would be a complete mapping
+    // Format: 'ZT Control ID': ['RMF Control ID1', 'RMF Control ID2', ...]
+    '1.1.1': ['AC-2', 'AC-3', 'AC-6', 'IA-2', 'IA-4'],
+    '1.2.1': ['AC-3', 'AC-6', 'IA-2', 'IA-4', 'IA-5'],
+    '2.1.1': ['AC-19', 'CM-2', 'CM-8', 'IA-3'],
+    '3.1.1': ['CM-7', 'CM-8', 'SC-7', 'SI-4'],
+    '4.1.1': ['AC-3', 'AC-4', 'AC-16', 'SC-8'],
+    '5.1.1': ['AC-4', 'SC-7', 'SC-8', 'SI-4'],
+    '6.1.1': ['CA-7', 'IR-4', 'SI-4'],
+    '7.1.1': ['AU-2', 'AU-3', 'AU-6', 'AU-8', 'AU-9']
+};
+
+// Zero Trust Control to Pillar Mapping
+const ZT_CONTROL_TO_PILLAR = {
+    // This is a simplified example - in production, this would be a complete mapping
+    // Format: 'ZT Control ID': 'Pillar Name'
+    '1.1.1': 'User',
+    '1.2.1': 'User',
+    '2.1.1': 'Device',
+    '3.1.1': 'Application & Workload',
+    '4.1.1': 'Data',
+    '5.1.1': 'Network & Environment',
+    '6.1.1': 'Automation & Orchestration',
+    '7.1.1': 'Visibility & Analytics'
+};
 
 // ===========================================
 // INITIALIZATION
@@ -431,104 +462,196 @@ function handleFileDrop(event) {
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
-    const fileInfo = document.getElementById('fileInfo');
+    if (!file) return;
     
-    if (!file) {
-        uploadedData = null;
-        if (fileInfo) fileInfo.style.display = 'none';
-        checkFormReady();
+    const fileInfo = document.getElementById('fileInfo');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    
+    // Check file type
+    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+        showError('Please upload a CSV file.');
         return;
     }
-
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-        showError('Please upload a CSV file');
-        return;
-    }
-
+    
+    // Display file info
+    fileInfo.innerHTML = `
+        <div class="file-details">
+            <p><strong>File:</strong> ${file.name}</p>
+            <p><strong>Size:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
+            <p><strong>Last Modified:</strong> ${new Date(file.lastModified).toLocaleString()}</p>
+        </div>
+    `;
+    fileInfo.style.display = 'block';
+    fileUploadArea.classList.add('file-uploaded');
+    
+    // Read file
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const csv = e.target.result;
-            uploadedData = parseCSV(csv);
-            
-            if (fileInfo) {
-                fileInfo.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 2em;">📄</div>
-                        <div>
-                            <strong>File loaded successfully!</strong><br>
-                            <span style="color: #6c757d;">📂 ${file.name}</span><br>
-                            <span style="color: #6c757d;">📊 ${uploadedData.length} controls detected</span><br>
-                            <span style="color: #6c757d;">📅 ${new Date().toLocaleDateString()}</span>
-                        </div>
-                    </div>
-                `;
-                fileInfo.style.display = 'block';
+            if (!csv || typeof csv !== 'string' || csv.trim() === '') {
+                showError('The uploaded file appears to be empty.');
+                return;
             }
             
-            hideError();
+            console.log('CSV file content preview:', {
+                length: csv.length,
+                firstLines: csv.split('\n').slice(0, 3).join('\n'),
+                lineCount: csv.split('\n').length
+            });
+            
+            uploadedData = parseCSV(csv);
+            
+            // Log parsed data for debugging
+            console.log('Parsed CSV data:', {
+                count: uploadedData.length,
+                sample: uploadedData.slice(0, 3)
+            });
+            
+            // Store original data for comparison and tracking changes
+            originalData = JSON.parse(JSON.stringify(uploadedData));
+            
+            if (!uploadedData || uploadedData.length === 0) {
+                showError('No valid control data found in the CSV file. Please check the format.');
+                return;
+            }
+            
+            // Check if we have valid control IDs
+            const overlayType = document.querySelector('input[name="overlay"]:checked')?.value;
+            if (!overlayType) {
+                showError('Please select an overlay type first.');
+                return;
+            }
+            
+            // Update additional questions if needed
+            updateAdditionalQuestions();
+            
+            // Show adjustment step
+            const adjustAnswersStep = document.getElementById('adjustAnswersStep');
+            if (adjustAnswersStep) {
+                adjustAnswersStep.style.display = 'block';
+                // Update step numbers
+                document.getElementById('processStepTitle').textContent = 'Step 6: Process Assessment';
+                // Populate adjustable controls
+                populateAdjustableControls();
+            }
+            
+            // Enable process button
             checkFormReady();
             
-        } catch (err) {
-            showError('Error reading file: ' + err.message);
-            uploadedData = null;
-            checkFormReady();
+            showSuccess(`Successfully loaded ${uploadedData.length} controls from ${file.name}`);
+        } catch (error) {
+            console.error('Error parsing CSV:', error);
+            showError(`Error parsing CSV file: ${error.message || 'Unknown error'}. Please check the format and try again.`);
         }
+    };
+    reader.onerror = function(error) {
+        console.error('FileReader error:', error);
+        showError('Error reading the file. Please try again.');
     };
     reader.readAsText(file);
 }
 
 function parseCSV(csv) {
-    const lines = csv.trim().split('\n');
-    const data = [];
-    
-    // Skip header row
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
+    try {
+        if (!csv || typeof csv !== 'string') {
+            console.error('Invalid CSV input:', csv);
+            throw new Error('Invalid CSV data format');
+        }
         
-        const columns = parseCSVLine(line);
-        if (columns.length >= 2) {
-            const controlId = columns[0].trim();
-            const status = columns[1].trim() || 'Non-compliant';
+        const lines = csv.trim().split('\n');
+        if (lines.length < 2) { // At least header + 1 data row
+            throw new Error('CSV file contains insufficient data');
+        }
+        
+        const data = [];
+        
+        // Skip header row
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
             
-            if (controlId) {
-                data.push({
-                    controlId: controlId,
-                    originalStatus: status,
-                    status: normalizeStatus(status),
-                    rowIndex: i
-                });
+            try {
+                const columns = parseCSVLine(line);
+                if (columns.length >= 2) {
+                    const controlId = columns[0].trim();
+                    const status = columns[1].trim() || 'Non-compliant';
+                    
+                    if (controlId) {
+                        data.push({
+                            controlId: controlId,
+                            originalStatus: status,
+                            status: normalizeStatus(status),
+                            rowIndex: i
+                        });
+                    }
+                }
+            } catch (lineError) {
+                console.warn(`Error parsing line ${i}: ${lineError.message}`, line);
+                // Continue processing other lines
             }
         }
+        
+        if (data.length === 0) {
+            throw new Error('No valid control data found in CSV');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Error parsing CSV:', {
+            message: error.message || 'Unknown error',
+            stack: error.stack,
+            csvLength: csv ? csv.length : 0,
+            csvPreview: csv ? csv.substring(0, 100) + '...' : 'null'
+        });
+        throw error; // Re-throw to be handled by caller
     }
-    
-    return data;
 }
 
 function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current.replace(/"/g, ''));
-            current = '';
-        } else {
-            current += char;
+    try {
+        if (!line || typeof line !== 'string') {
+            throw new Error('Invalid line format');
         }
+        
+        const result = [];
+        let inQuotes = false;
+        let currentValue = '';
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(currentValue.replace(/"/g, ''));
+                currentValue = '';
+            } else {
+                currentValue += char;
+            }
+        }
+        
+        // Push the last value
+        result.push(currentValue.replace(/"/g, ''));
+        
+        return result;
+    } catch (error) {
+        console.error('Error parsing CSV line:', {
+            message: error.message || 'Unknown error',
+            stack: error.stack,
+            lineContent: line ? (line.length > 100 ? line.substring(0, 100) + '...' : line) : 'null',
+            lineLength: line ? line.length : 0
+        });
+        throw error;
     }
-    
-    result.push(current.replace(/"/g, ''));
-    return result;
 }
 
 function normalizeStatus(status) {
+    // Handle undefined, null or non-string status
+    if (!status || typeof status !== 'string') {
+        return 'Non-compliant';
+    }
+    
     const normalized = status.toLowerCase().trim();
     const cleaned = normalized.replace(/[^\w\s-]/g, '').trim();
     
@@ -611,6 +734,134 @@ function renderAdditionalQuestions(questions) {
 }
 
 // ===========================================
+// ANSWER ADJUSTMENT FUNCTIONALITY
+// ===========================================
+
+function populateAdjustableControls() {
+    const container = document.getElementById('adjustableControls');
+    if (!container || !uploadedData) return;
+    
+    container.innerHTML = '';
+    
+    // Get selected overlay type
+    const overlayType = document.querySelector('input[name="overlay"]:checked')?.value;
+    if (!overlayType) return;
+    
+    // Get overlay controls
+    const overlayControls = ZT_OVERLAYS[overlayType];
+    
+    // Create adjustment UI for each control
+    Object.entries(uploadedData).forEach(([controlId, status]) => {
+        // Get control info if it exists in the overlay
+        const controlInfo = overlayControls[controlId] || { family: 'Unknown', name: controlId };
+        
+        const controlItem = document.createElement('div');
+        controlItem.className = 'control-item';
+        controlItem.dataset.controlId = controlId;
+        controlItem.dataset.status = status.toLowerCase();
+        
+        // Create control header
+        const header = document.createElement('div');
+        header.className = 'control-header';
+        
+        const idSpan = document.createElement('span');
+        idSpan.className = 'control-id';
+        idSpan.textContent = controlId;
+        
+        header.appendChild(idSpan);
+        controlItem.appendChild(header);
+        
+        // Control name
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'control-name';
+        nameDiv.textContent = controlInfo.name;
+        controlItem.appendChild(nameDiv);
+        
+        // Status selector
+        const statusSelector = document.createElement('div');
+        statusSelector.className = 'control-status-selector';
+        
+        const statuses = ['Compliant', 'Non-compliant', 'Inherited', 'N/A'];
+        statuses.forEach(statusOption => {
+            const label = document.createElement('label');
+            
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = `status-${controlId}`;
+            radio.value = statusOption.toLowerCase();
+            radio.checked = status.toLowerCase() === statusOption.toLowerCase();
+            radio.addEventListener('change', () => updateControlStatus(controlId, statusOption));
+            
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(statusOption));
+            statusSelector.appendChild(label);
+        });
+        
+        controlItem.appendChild(statusSelector);
+        
+        // Comment field
+        const commentField = document.createElement('div');
+        commentField.className = 'comment-field';
+        
+        const commentLabel = document.createElement('label');
+        commentLabel.textContent = 'Justification for adjustment:';
+        commentField.appendChild(commentLabel);
+        
+        const textarea = document.createElement('textarea');
+        textarea.placeholder = 'Enter justification for any status changes...';
+        textarea.value = adjustmentComments[controlId] || '';
+        textarea.addEventListener('input', () => {
+            adjustmentComments[controlId] = textarea.value;
+        });
+        
+        commentField.appendChild(textarea);
+        controlItem.appendChild(commentField);
+        
+        // Add to container
+        container.appendChild(controlItem);
+    });
+    
+    // Add filter functionality
+    document.getElementById('filterControls').addEventListener('change', filterAdjustableControls);
+}
+
+// Update control status when user changes it
+function updateControlStatus(controlId, newStatus) {
+    uploadedData[controlId] = newStatus;
+    
+    // Update data display
+    const controlItem = document.querySelector(`.control-item[data-control-id="${controlId}"]`);
+    if (controlItem) {
+        controlItem.dataset.status = newStatus.toLowerCase();
+    }
+}
+
+// Filter controls based on selected status
+function filterAdjustableControls() {
+    const filterValue = document.getElementById('filterControls').value;
+    const controls = document.querySelectorAll('.control-item');
+    
+    controls.forEach(control => {
+        if (filterValue === 'all' || control.dataset.status.toLowerCase() === filterValue) {
+            control.style.display = 'block';
+        } else {
+            control.style.display = 'none';
+        }
+    });
+}
+
+// Save adjustments
+function saveAdjustments() {
+    // Store adjustment comments for reporting
+    localStorage.setItem('zt_adjustment_comments', JSON.stringify(adjustmentComments));
+    
+    showSuccess('Adjustments saved successfully!');
+    
+    // Enable process button
+    checkFormReady();
+}
+
+// ===========================================
 // FORM VALIDATION
 // ===========================================
 
@@ -676,8 +927,24 @@ function processAssessment() {
             clearInterval(progressInterval);
             if (progressFill) progressFill.style.width = '100%';
             
-            const overlay = document.querySelector('input[name="overlay"]:checked').value;
+            const overlayInput = document.querySelector('input[name="overlay"]:checked');
+            if (!overlayInput) {
+                throw new Error('No overlay selected');
+            }
+            
+            const overlay = overlayInput.value;
+            console.log('Selected overlay:', overlay);
+            
             const overlayControls = ZT_OVERLAYS[overlay];
+            if (!overlayControls) {
+                throw new Error(`Invalid overlay type: ${overlay}. Available overlays: ${Object.keys(ZT_OVERLAYS).join(', ')}`);
+            }
+            
+            console.log('Overlay controls:', {
+                type: overlay,
+                controlCount: Object.keys(overlayControls).length,
+                sampleControls: Object.keys(overlayControls).slice(0, 3)
+            });
             
             processedResults = analyzeCompliance(uploadedData, overlayControls, overlay);
             
@@ -693,34 +960,106 @@ function processAssessment() {
         } catch (err) {
             clearInterval(progressInterval);
             hideLoading();
-            showError('Error processing assessment: ' + err.message);
-            console.error('Processing error:', err);
+            const errorMessage = err.message || 'Unknown error';
+            showError('Error processing assessment: ' + errorMessage);
+            console.error('Processing error:', {
+                message: errorMessage,
+                stack: err.stack,
+                data: {
+                    uploadedDataLength: uploadedData ? uploadedData.length : 0,
+                    overlay: document.querySelector('input[name="overlay"]:checked')?.value
+                }
+            });
         }
     }, 2000);
 }
 
 function analyzeCompliance(data, overlayControls, overlayType) {
-    const agencySelect = document.getElementById('agencySelect');
-    const results = {
-        compliant: 0,
-        nonCompliant: 0,
-        inherited: 0,
-        na: 0,
-        total: 0,
-        overlayType: overlayType,
-        agency: agencySelect ? agencySelect.value : 'Unknown',
-        processedDate: new Date().toISOString(),
-        details: [],
-        familyBreakdown: {},
-        criticalGaps: [],
-        additionalAnswers: { ...additionalAnswers }
-    };
+    try {
+        // Validate inputs
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            throw new Error('Invalid or empty assessment data');
+        }
+        
+        if (!overlayControls || typeof overlayControls !== 'object') {
+            throw new Error('Invalid overlay controls');
+        }
+        
+        if (!overlayType || typeof overlayType !== 'string') {
+            throw new Error('Invalid overlay type');
+        }
+        
+        // Log input data for debugging
+        console.log('analyzeCompliance inputs:', {
+            dataLength: data.length,
+            dataSample: data.slice(0, 3),
+            overlayType: overlayType,
+            overlayControlsCount: Object.keys(overlayControls).length,
+            overlayControlsSample: Object.keys(overlayControls).slice(0, 3).map(key => ({ key, value: overlayControls[key] }))
+        });
+        
+        const agencySelect = document.getElementById('agencySelect');
+    
+        // Initialize results object
+        const results = {
+            total: 0,
+            compliant: 0,
+            nonCompliant: 0,
+            inherited: 0,
+            na: 0,
+            complianceScore: 0,
+            familyBreakdown: {},
+            controlDetails: {},
+            ztControlBreakdown: {},
+            pillarBreakdown: {},
+            agency: agencySelect ? agencySelect.value : 'Unknown',
+            overlayType: overlayType, // Ensure overlayType is stored in results
+            processedDate: new Date().toISOString(),
+            details: [],
+            criticalGaps: []
+        };
+    
+        // Initialize Zero Trust pillars
+        const pillars = [
+            'User',
+            'Device',
+            'Application & Workload',
+            'Data',
+            'Network & Environment',
+            'Automation & Orchestration',
+            'Visibility & Analytics'
+        ];
+    
+        pillars.forEach(pillar => {
+            results.pillarBreakdown[pillar] = {
+                total: 0,
+                compliant: 0,
+                nonCompliant: 0,
+                inherited: 0,
+                na: 0,
+                complianceScore: 0
+            };
+        });
+    
+        // Initialize ZT control status tracking
+        const ztControlStatus = {};
+        Object.keys(ZT_TO_RMF_MAPPING).forEach(ztControlId => {
+            ztControlStatus[ztControlId] = {
+                rmfControls: [],
+                status: 'compliant', // Default to compliant, will be changed if any RMF control is non-compliant
+                totalControls: 0,
+                applicableControls: 0 // Excluding N/A controls
+            };
+        });
 
-    // Create a map of user controls for quick lookup
-    const userControls = {};
-    data.forEach(item => {
-        userControls[item.controlId] = item;
-    });
+        // Add additional answers to results
+        results.additionalAnswers = { ...additionalAnswers };
+
+        // Create a map of user controls for quick lookup
+        const userControls = {};
+        data.forEach(item => {
+            userControls[item.controlId] = item;
+        });
 
     // Analyze each required overlay control
     Object.keys(overlayControls).forEach(controlId => {
@@ -741,70 +1080,157 @@ function analyzeCompliance(data, overlayControls, overlayType) {
         results.details.push(detail);
 
         // Count by status
-        switch (userStatus) {
-            case 'Compliant':
-                results.compliant++;
-                break;
-            case 'Non-compliant':
-                results.nonCompliant++;
-                results.criticalGaps.push(detail);
-                break;
-            case 'Inherited':
-                results.inherited++;
-                break;
-            case 'N/A':
-                results.na++;
-                break;
-        }
-        
-        results.total++;
-
-        // Family breakdown
         const family = controlInfo.family;
+        
+        // Initialize family if not exists
         if (!results.familyBreakdown[family]) {
             results.familyBreakdown[family] = {
+                total: 0,
                 compliant: 0,
                 nonCompliant: 0,
                 inherited: 0,
                 na: 0,
-                total: 0
+                complianceScore: 0
             };
         }
         
-        // Map status to property name for family breakdown
-        let statusKey;
-        switch (userStatus) {
-            case 'Compliant':
-                statusKey = 'compliant';
+        // Normalize status
+        const normalizedStatus = normalizeStatus(userStatus);
+        
+        // Update RMF control counts
+        results.total++;
+        results.familyBreakdown[family].total++;
+        
+        switch (normalizedStatus) {
+            case 'compliant':
+                results.compliant++;
+                results.familyBreakdown[family].compliant++;
                 break;
-            case 'Non-compliant':
-                statusKey = 'nonCompliant';
+            case 'non-compliant':
+                results.nonCompliant++;
+                results.familyBreakdown[family].nonCompliant++;
                 break;
-            case 'Inherited':
-                statusKey = 'inherited';
+            case 'inherited':
+                results.inherited++;
+                results.familyBreakdown[family].inherited++;
                 break;
-            case 'N/A':
-                statusKey = 'na';
+            case 'n/a':
+                results.na++;
+                results.familyBreakdown[family].na++;
                 break;
-            default:
-                statusKey = 'nonCompliant';
         }
         
-        results.familyBreakdown[family][statusKey]++;
-        results.familyBreakdown[family].total++;
+        // Store control details
+        results.controlDetails[controlId] = {
+            id: controlId,
+            name: controlInfo.name,
+            family: family,
+            status: normalizedStatus
+        };
+        
+        // Map RMF control to Zero Trust controls
+        for (const [ztControlId, rmfControls] of Object.entries(ZT_TO_RMF_MAPPING)) {
+            if (rmfControls.includes(controlId)) {
+                ztControlStatus[ztControlId].rmfControls.push({
+                    id: controlId,
+                    status: normalizedStatus
+                });
+                
+                ztControlStatus[ztControlId].totalControls++;
+                
+                // Count applicable controls (not N/A)
+                if (normalizedStatus !== 'n/a') {
+                    ztControlStatus[ztControlId].applicableControls++;
+                    
+                    // If any RMF control is non-compliant, the entire ZT control is non-compliant
+                    if (normalizedStatus === 'non-compliant') {
+                        ztControlStatus[ztControlId].status = 'non-compliant';
+                    }
+                }
+            }
+        }
     });
-
-    // Calculate compliance percentage (Compliant + Inherited vs effective total)
-    const effectiveTotal = results.total - results.na;
-    const effectiveCompliant = results.compliant + results.inherited;
-    results.compliancePercentage = effectiveTotal > 0 ? ((effectiveCompliant / effectiveTotal) * 100) : 0;
-    results.effectiveTotal = effectiveTotal;
-    results.effectiveCompliant = effectiveCompliant;
-
-    return results;
+    
+    // Calculate compliance scores for RMF controls
+    // Formula: (Compliant + Inherited) / (Total - N/A) * 100
+    const totalMinusNA = results.total - results.na;
+    if (totalMinusNA > 0) {
+        results.complianceScore = ((results.compliant + results.inherited) / totalMinusNA) * 100;
+    }
+    
+    // Calculate family compliance scores
+    Object.keys(results.familyBreakdown).forEach(family => {
+        const familyData = results.familyBreakdown[family];
+        const familyTotalMinusNA = familyData.total - familyData.na;
+        
+        if (familyTotalMinusNA > 0) {
+            familyData.complianceScore = ((familyData.compliant + familyData.inherited) / familyTotalMinusNA) * 100;
+        }
+    });
+    
+    // Process Zero Trust controls and map them to pillars
+    Object.entries(ztControlStatus).forEach(([ztControlId, ztControl]) => {
+        // Skip if no applicable controls
+        if (ztControl.applicableControls === 0) return;
+        
+        // Get the pillar for this ZT control
+        const pillar = ZT_CONTROL_TO_PILLAR[ztControlId] || 'Unknown';
+        
+        // Initialize ZT control breakdown if not exists
+        if (!results.ztControlBreakdown[ztControlId]) {
+            results.ztControlBreakdown[ztControlId] = {
+                id: ztControlId,
+                pillar: pillar,
+                status: ztControl.status,
+                rmfControls: ztControl.rmfControls
+            };
+        }
+        
+        // Update pillar counts
+        if (pillar !== 'Unknown' && results.pillarBreakdown[pillar]) {
+            results.pillarBreakdown[pillar].total++;
+            
+            switch (ztControl.status) {
+                case 'compliant':
+                    results.pillarBreakdown[pillar].compliant++;
+                    break;
+                case 'non-compliant':
+                    results.pillarBreakdown[pillar].nonCompliant++;
+                    break;
+                case 'inherited':
+                    results.pillarBreakdown[pillar].inherited++;
+                    break;
+                case 'n/a':
+                    results.pillarBreakdown[pillar].na++;
+                    break;
+            }
+        }
+    });
+    
+    // Calculate pillar compliance scores
+    Object.keys(results.pillarBreakdown).forEach(pillar => {
+        const pillarData = results.pillarBreakdown[pillar];
+        const pillarTotalMinusNA = pillarData.total - pillarData.na;
+        
+        if (pillarTotalMinusNA > 0) {
+            pillarData.complianceScore = ((pillarData.compliant + pillarData.inherited) / pillarTotalMinusNA) * 100;
+        }
+    });
+    
+        return results;
+    } catch (error) {
+        console.error('Error in analyzeCompliance:', {
+            message: error.message || 'Unknown error',
+            stack: error.stack,
+            data: {
+                dataLength: data ? data.length : 0,
+                overlayType: overlayType || 'undefined'
+            }
+        });
+        throw error; // Re-throw to be handled by caller
+    }
 }
 
-// ===========================================
 // RESULTS DISPLAY
 // ===========================================
 
@@ -813,6 +1239,7 @@ function displayResults(results) {
     updateComplianceScore(results);
     createComplianceChart(results);
     createFamilyChart(results);
+    createPillarChart(results);
     displayDetailedAnalysis(results);
 }
 
@@ -850,11 +1277,26 @@ function updateComplianceScore(results) {
     const effectiveCompliant = document.getElementById('effectiveCompliant');
     const effectiveTotal = document.getElementById('effectiveTotal');
 
-    const percentage = results.compliancePercentage.toFixed(1);
+    // Calculate compliance percentage if it doesn't exist
+    if (results.complianceScore !== undefined) {
+        // Use complianceScore from the updated calculation
+        var percentage = results.complianceScore.toFixed(1);
+    } else if (results.compliancePercentage !== undefined) {
+        // Use legacy compliancePercentage if available
+        var percentage = results.compliancePercentage.toFixed(1);
+    } else {
+        // Calculate it if neither is available
+        const totalMinusNA = results.total - (results.na || 0);
+        var percentage = totalMinusNA > 0 ? 
+            (((results.compliant || 0) + (results.inherited || 0)) / totalMinusNA * 100).toFixed(1) : 
+            '0.0';
+    }
     
     if (overallScore) overallScore.textContent = `${percentage}%`;
-    if (effectiveCompliant) effectiveCompliant.textContent = results.effectiveCompliant;
-    if (effectiveTotal) effectiveTotal.textContent = results.effectiveTotal;
+    if (effectiveCompliant) effectiveCompliant.textContent = results.effectiveCompliant || 
+        ((results.compliant || 0) + (results.inherited || 0));
+    if (effectiveTotal) effectiveTotal.textContent = results.effectiveTotal || 
+        ((results.total || 0) - (results.na || 0));
     
     // Update score circle color based on compliance level
     if (scoreCircle) {
@@ -909,7 +1351,7 @@ function createComplianceChart(results) {
             plugins: {
                 title: {
                     display: true,
-                    text: `${results.agency} - ${results.overlayType.toUpperCase()} ZT Controls`,
+                    text: `${results.agency} - ${results.overlayType ? results.overlayType.toUpperCase() : 'STANDARD'} ZT Controls`,
                     font: { size: 16, weight: 'bold' }
                 },
                 legend: {
@@ -1040,6 +1482,111 @@ function createFamilyChart(results) {
                             const item = familyData[index];
                             return `Overall: ${item.compliancePercent.toFixed(1)}% compliant`;
                         }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createPillarChart(results) {
+    const ctx = document.getElementById('pillarChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (pillarChart) {
+        pillarChart.destroy();
+    }
+    
+    // Get pillars from the results
+    const pillars = Object.keys(results.pillarBreakdown);
+    
+    // Prepare data arrays for each status
+    const compliantData = [];
+    const nonCompliantData = [];
+    const inheritedData = [];
+    const naData = [];
+    
+    // Populate data arrays
+    pillars.forEach(pillar => {
+        const pillarData = results.pillarBreakdown[pillar];
+        compliantData.push(pillarData.compliant);
+        nonCompliantData.push(pillarData.nonCompliant);
+        inheritedData.push(pillarData.inherited);
+        naData.push(pillarData.na);
+    });
+    
+    // Create stacked bar chart
+    pillarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: pillars,
+            datasets: [
+                {
+                    label: 'Compliant',
+                    data: compliantData,
+                    backgroundColor: '#28a745',
+                    borderColor: '#1e7e34',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Non-Compliant',
+                    data: nonCompliantData,
+                    backgroundColor: '#dc3545',
+                    borderColor: '#bd2130',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Inherited',
+                    data: inheritedData,
+                    backgroundColor: '#17a2b8',
+                    borderColor: '#138496',
+                    borderWidth: 1
+                },
+                {
+                    label: 'N/A',
+                    data: naData,
+                    backgroundColor: '#6c757d',
+                    borderColor: '#5a6268',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Zero Trust Pillars Compliance',
+                    font: { size: 16 }
+                },
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.raw;
+                            const datasetLabel = context.dataset.label;
+                            return `${datasetLabel}: ${value}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Zero Trust Pillars'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Controls'
                     }
                 }
             }
