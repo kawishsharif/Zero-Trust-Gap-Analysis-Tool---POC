@@ -71,97 +71,185 @@ const ADDITIONAL_QUESTIONS = {
     target: [
         {
             id: 'target_q1',
-            text: '2.6.3 Enterprise Device Management Part 2: DoD Components migrate remaining devices to the UEM solution and integrate with risk and compliance solutions as appropriate.',
+            text: '1.1.2 Identity Management: Has your organization implemented an Enterprise Identity Lifecycle Management (ILM) solution for centralized identity management?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'target_q2',
-            text: '3.4.2 Resource Authorization Part 2. Resource authorization gateways are used for all possible applications/services.',
+            text: '1.2.5 Authentication Methods: Are NIST AAL2 (or higher) authentication mechanisms in place for all users with privileged access?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'target_q3',
-            text: '3.4.7 SDC Resource Authorization Part 2. Applications which support software-based configuration and management have been transitioned to a production/live environment.',
+            text: '1.3.4 Authorization: Has your organization implemented role-based access controls with principle of least privilege for all systems?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'target_q4',
-            text: '4.2.2 Interoperability Standards. The DoD Enterprise, collaborating with the Components, develops interoperability standards integrating mandatory DRM and Protection solutions.',
+            text: '1.4.1 Federation: Are federated identity standards (SAML, OAuth, OIDC) utilized for system authentication?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q5',
+            text: '2.1.3 Device Inventory: Does your organization maintain a comprehensive inventory of all endpoint devices?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q6',
+            text: '2.6.3 Enterprise Device Management: Have you migrated devices to a Unified Endpoint Management (UEM) solution integrated with risk and compliance monitoring?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q7',
+            text: '3.1.2 Network Segmentation: Has your organization implemented micro-segmentation to isolate critical systems and data?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q8',
+            text: '3.4.2 Resource Authorization: Are resource authorization gateways used for all possible applications/services?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q9',
+            text: '3.4.7 SDC Resource Authorization: Have applications supporting software-based configuration and management been transitioned to production?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q10',
+            text: '4.1.1 Data Categorization: Has your organization implemented data categorization standards aligned with regulatory requirements?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q11',
+            text: '4.2.2 Interoperability Standards: Have you developed interoperability standards integrating mandatory Data Rights Management and Protection solutions?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'target_q12',
+            text: '5.1.3 Traffic Monitoring: Has your organization implemented continuous network traffic monitoring and analysis?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         }
     ],
     advanced: [
         {
             id: 'adv_q1',
-            text: '1.5.4 Enterprise ILM Part 3: DoD Components will further integrate critical IdP and ICAM automated functions into the enterprise ILM process.',
+            text: '1.5.4 Enterprise ILM Part 3: Have you integrated critical Identity Provider and ICAM automated functions into the enterprise Identity Lifecycle Management process?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'adv_q2',
-            text: '1.6.3 User Activity Monitoring Part 2. DoD Components continue using analytics from UEBA and UAM solutions.',
+            text: '1.6.3 User Activity Monitoring: Does your organization actively utilize analytics from User and Entity Behavior Analytics (UEBA) and User Activity Monitoring (UAM) solutions?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'adv_q3',
-            text: '1.8.4 Continuous Authentication Part 2: DoD organizations continue the use of transaction-based authentication.',
+            text: '1.7.2 Privileged Access Management: Have you implemented Just-In-Time access controls and session recording for all privileged access?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'adv_q4',
-            text: '1.9.3 Enterprise PKI/IdP Part 3: DoD organizations integrate the remaining applications/services with biometrics functionalities.',
+            text: '1.8.4 Continuous Authentication: Has your organization implemented transaction-based authentication for high-risk operations?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'adv_q5',
-            text: '2.3.7 Enterprise PKI Part 2: DoD Components use certificates for device authentication and machine to machine communications.',
+            text: '1.9.3 Enterprise PKI/IdP: Have you integrated applications/services with biometric authentication capabilities?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         },
         {
             id: 'adv_q6',
-            text: '3.4.5 REST API Micro-segments. Using the DoD Enterprise approved API gateway(s), micro-segmented application calls only allow authenticated and authorized access.',
+            text: '2.2.5 Endpoint Integrity: Is device health attestation required before accessing critical applications or data?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q7',
+            text: '2.3.7 Enterprise PKI: Do you use certificates for device authentication and machine-to-machine communications?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q8',
+            text: '2.7.3 Endpoint Security: Have you implemented real-time endpoint threat detection and response capabilities?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q9',
+            text: '3.3.6 Secure Communication: Is all network traffic authenticated and encrypted regardless of classification?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q10',
+            text: '3.4.5 REST API Micro-segments: Are API gateways configured to enforce authentication and authorization for all application calls?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q11',
+            text: '4.3.8 Data Access Control: Have you implemented attribute-based access control for all sensitive data repositories?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q12',
+            text: '5.2.6 Behavioral Analytics: Is your security monitoring enhanced with AI/ML-based behavioral analytics for threat detection?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q13',
+            text: '5.4.2 Automation: Has your organization implemented automated security orchestration and response capabilities?',
+            options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
+        },
+        {
+            id: 'adv_q14',
+            text: '5.5.3 Continuous Monitoring: Is your zero trust architecture continuously assessed for effectiveness and compliance?',
             options: ['Compliant', 'Non-Compliant', 'Not Applicable', 'Inherited']
         }
     ]
 };
 
+// Zero Trust Pillars Definition
+const ZT_PILLARS = {
+    'Pillar 1': {
+        name: 'User',
+        description: 'Identity, authentication, and access management',
+        controls: ['ZT-1.1.1', 'ZT-1.2.1', 'ZT-1.3.1'] // List of ZT controls that belong to this pillar
+    },
+    'Pillar 2': {
+        name: 'Device',
+        description: 'Device security and management',
+        controls: ['ZT-2.1.1', 'ZT-2.2.1'] // List of ZT controls that belong to this pillar
+    },
+    'Pillar 3': {
+        name: 'Application & Workload',
+        description: 'Application security and access control',
+        controls: ['ZT-3.1.1', 'ZT-3.2.1'] // List of ZT controls that belong to this pillar
+    },
+    'Pillar 4': {
+        name: 'Data',
+        description: 'Data classification, protection and access control',
+        controls: ['ZT-4.1.1'] // List of ZT controls that belong to this pillar
+    },
+    'Pillar 5': {
+        name: 'Network & Environment',
+        description: 'Network segmentation and secure communication',
+        controls: ['ZT-5.1.1'] // List of ZT controls that belong to this pillar
+    },
+    'Pillar 6': {
+        name: 'Automation & Orchestration',
+        description: 'Security automation and orchestration',
+        controls: [] // Placeholder for when these controls are added
+    },
+    'Pillar 7': {
+        name: 'Visibility & Analytics',
+        description: 'Continuous monitoring and analytics',
+        controls: [] // Placeholder for when these controls are added
+    }
+};
+
 // Global Variables
 let agencies = ['NASA', 'IQVIA', 'CDC', 'State of Texas', 'MITRE'];
 let uploadedData = null;
-let originalData = null; // Store original data before adjustments
 let processedResults = null;
 let additionalAnswers = {};
 let complianceChart = null;
-let familyChart = null;
-let pillarChart = null; // For Zero Trust pillars chart
-let adjustmentComments = {}; // Store comments for adjustments
-
-// Zero Trust to RMF Control Mapping
-const ZT_TO_RMF_MAPPING = {
-    // This is a simplified example - in production, this would be a complete mapping
-    // Format: 'ZT Control ID': ['RMF Control ID1', 'RMF Control ID2', ...]
-    '1.1.1': ['AC-2', 'AC-3', 'AC-6', 'IA-2', 'IA-4'],
-    '1.2.1': ['AC-3', 'AC-6', 'IA-2', 'IA-4', 'IA-5'],
-    '2.1.1': ['AC-19', 'CM-2', 'CM-8', 'IA-3'],
-    '3.1.1': ['CM-7', 'CM-8', 'SC-7', 'SI-4'],
-    '4.1.1': ['AC-3', 'AC-4', 'AC-16', 'SC-8'],
-    '5.1.1': ['AC-4', 'SC-7', 'SC-8', 'SI-4'],
-    '6.1.1': ['CA-7', 'IR-4', 'SI-4'],
-    '7.1.1': ['AU-2', 'AU-3', 'AU-6', 'AU-8', 'AU-9']
-};
-
-// Zero Trust Control to Pillar Mapping
-const ZT_CONTROL_TO_PILLAR = {
-    // This is a simplified example - in production, this would be a complete mapping
-    // Format: 'ZT Control ID': 'Pillar Name'
-    '1.1.1': 'User',
-    '1.2.1': 'User',
-    '2.1.1': 'Device',
-    '3.1.1': 'Application & Workload',
-    '4.1.1': 'Data',
-    '5.1.1': 'Network & Environment',
-    '6.1.1': 'Automation & Orchestration',
-    '7.1.1': 'Visibility & Analytics'
-};
+let pillarChart = null; // Renamed from familyChart to pillarChart
 
 // ===========================================
 // INITIALIZATION
@@ -461,199 +549,125 @@ function handleFileDrop(event) {
 }
 
 function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    const file = event.target?.files?.[0] || (event.dataTransfer?.files?.[0]);
     
-    const fileInfo = document.getElementById('fileInfo');
-    const fileUploadArea = document.getElementById('fileUploadArea');
-    
-    // Check file type
-    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-        showError('Please upload a CSV file.');
+    if (!file) {
+        showError('No file selected.');
         return;
     }
     
-    // Display file info
-    fileInfo.innerHTML = `
-        <div class="file-details">
-            <p><strong>File:</strong> ${file.name}</p>
-            <p><strong>Size:</strong> ${(file.size / 1024).toFixed(2)} KB</p>
-            <p><strong>Last Modified:</strong> ${new Date(file.lastModified).toLocaleString()}</p>
-        </div>
-    `;
-    fileInfo.style.display = 'block';
-    fileUploadArea.classList.add('file-uploaded');
+    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+        showError('Please upload a valid CSV file.');
+        return;
+    }
     
-    // Read file
     const reader = new FileReader();
+    
     reader.onload = function(e) {
         try {
-            const csv = e.target.result;
-            if (!csv || typeof csv !== 'string' || csv.trim() === '') {
-                showError('The uploaded file appears to be empty.');
-                return;
+            const csvContent = e.target.result;
+            uploadedData = parseCSV(csvContent);
+            
+            if (uploadedData && uploadedData.length > 0) {
+                // Display file info
+                const fileInfo = document.getElementById('fileInfo');
+                if (fileInfo) {
+                    fileInfo.innerHTML = `
+                        <div class="file-success">
+                            <div>✅ File loaded successfully: <strong>${file.name}</strong></div>
+                            <div>${uploadedData.length} control(s) found</div>
+                            <button id="reviewControlsBtn" class="btn btn-secondary">Review & Adjust Controls</button>
+                        </div>
+                    `;
+                    fileInfo.style.display = 'block';
+                    
+                    // Add event listener to the review button
+                    const reviewBtn = document.getElementById('reviewControlsBtn');
+                    if (reviewBtn) {
+                        reviewBtn.addEventListener('click', function() {
+                            populateAdjustableControls();
+                        });
+                    }
+                }
+                
+                // Ensure form state is updated
+                checkFormReady();
+                
+                // Update additional questions based on overlay selection
+                updateAdditionalQuestions();
+                
+            } else {
+                showError('No valid data found in the CSV file.');
             }
-            
-            console.log('CSV file content preview:', {
-                length: csv.length,
-                firstLines: csv.split('\n').slice(0, 3).join('\n'),
-                lineCount: csv.split('\n').length
-            });
-            
-            uploadedData = parseCSV(csv);
-            
-            // Log parsed data for debugging
-            console.log('Parsed CSV data:', {
-                count: uploadedData.length,
-                sample: uploadedData.slice(0, 3)
-            });
-            
-            // Store original data for comparison and tracking changes
-            originalData = JSON.parse(JSON.stringify(uploadedData));
-            
-            if (!uploadedData || uploadedData.length === 0) {
-                showError('No valid control data found in the CSV file. Please check the format.');
-                return;
-            }
-            
-            // Check if we have valid control IDs
-            const overlayType = document.querySelector('input[name="overlay"]:checked')?.value;
-            if (!overlayType) {
-                showError('Please select an overlay type first.');
-                return;
-            }
-            
-            // Update additional questions if needed
-            updateAdditionalQuestions();
-            
-            // Show adjustment step
-            const adjustAnswersStep = document.getElementById('adjustAnswersStep');
-            if (adjustAnswersStep) {
-                adjustAnswersStep.style.display = 'block';
-                // Update step numbers
-                document.getElementById('processStepTitle').textContent = 'Step 6: Process Assessment';
-                // Populate adjustable controls
-                populateAdjustableControls();
-            }
-            
-            // Enable process button
-            checkFormReady();
-            
-            showSuccess(`Successfully loaded ${uploadedData.length} controls from ${file.name}`);
-        } catch (error) {
-            console.error('Error parsing CSV:', error);
-            showError(`Error parsing CSV file: ${error.message || 'Unknown error'}. Please check the format and try again.`);
+        } catch (err) {
+            console.error('Error parsing CSV:', err);
+            showError('Error parsing CSV file: ' + err.message);
         }
     };
-    reader.onerror = function(error) {
-        console.error('FileReader error:', error);
-        showError('Error reading the file. Please try again.');
+    
+    reader.onerror = function() {
+        showError('Error reading file.');
     };
+    
     reader.readAsText(file);
 }
 
 function parseCSV(csv) {
-    try {
-        if (!csv || typeof csv !== 'string') {
-            console.error('Invalid CSV input:', csv);
-            throw new Error('Invalid CSV data format');
-        }
+    const lines = csv.trim().split('\n');
+    const data = [];
+    
+    // Skip header row
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
         
-        const lines = csv.trim().split('\n');
-        if (lines.length < 2) { // At least header + 1 data row
-            throw new Error('CSV file contains insufficient data');
-        }
-        
-        const data = [];
-        
-        // Skip header row
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
+        const columns = parseCSVLine(line);
+        if (columns.length >= 2) {
+            const controlId = columns[0].trim();
+            const status = columns[1].trim() || 'Non-compliant';
             
-            try {
-                const columns = parseCSVLine(line);
-                if (columns.length >= 2) {
-                    const controlId = columns[0].trim();
-                    const status = columns[1].trim() || 'Non-compliant';
-                    
-                    if (controlId) {
-                        data.push({
-                            controlId: controlId,
-                            originalStatus: status,
-                            status: normalizeStatus(status),
-                            rowIndex: i
-                        });
-                    }
-                }
-            } catch (lineError) {
-                console.warn(`Error parsing line ${i}: ${lineError.message}`, line);
-                // Continue processing other lines
+            if (controlId) {
+                data.push({
+                    controlId: controlId,
+                    originalStatus: status,
+                    status: normalizeStatus(status),
+                    rowIndex: i
+                });
             }
         }
-        
-        if (data.length === 0) {
-            throw new Error('No valid control data found in CSV');
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('Error parsing CSV:', {
-            message: error.message || 'Unknown error',
-            stack: error.stack,
-            csvLength: csv ? csv.length : 0,
-            csvPreview: csv ? csv.substring(0, 100) + '...' : 'null'
-        });
-        throw error; // Re-throw to be handled by caller
     }
+        
+    return data;
 }
 
 function parseCSVLine(line) {
-    try {
-        if (!line || typeof line !== 'string') {
-            throw new Error('Invalid line format');
-        }
+    let inQuote = false;
+    let currentValue = '';
+    let values = [];
         
-        const result = [];
-        let inQuotes = false;
-        let currentValue = '';
-        
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
             
-            if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                result.push(currentValue.replace(/"/g, ''));
-                currentValue = '';
-            } else {
-                currentValue += char;
-            }
+        if (char === '"') {
+            inQuote = !inQuote;
+        } else if (char === ',' && !inQuote) {
+            values.push(currentValue.trim());
+            currentValue = '';
+        } else {
+            currentValue += char;
         }
-        
-        // Push the last value
-        result.push(currentValue.replace(/"/g, ''));
-        
-        return result;
-    } catch (error) {
-        console.error('Error parsing CSV line:', {
-            message: error.message || 'Unknown error',
-            stack: error.stack,
-            lineContent: line ? (line.length > 100 ? line.substring(0, 100) + '...' : line) : 'null',
-            lineLength: line ? line.length : 0
-        });
-        throw error;
     }
+        
+    // Add the last value
+    values.push(currentValue.trim());
+        
+    return values;
 }
 
 function normalizeStatus(status) {
-    // Handle undefined, null or non-string status
-    if (!status || typeof status !== 'string') {
-        return 'Non-compliant';
-    }
-    
     const normalized = status.toLowerCase().trim();
     const cleaned = normalized.replace(/[^\w\s-]/g, '').trim();
+        
     
     if (cleaned.includes('compliant') && !cleaned.includes('non')) return 'Compliant';
     if (cleaned.includes('non-compliant') || cleaned.includes('noncompliant')) return 'Non-compliant';
@@ -662,6 +676,216 @@ function normalizeStatus(status) {
     if (cleaned === '' || cleaned === 'null') return 'Non-compliant';
     
     return 'Non-compliant';
+}
+
+// Function to show and populate the adjustment step
+function populateAdjustableControls() {
+    const adjustAnswersStep = document.getElementById('adjustAnswersStep');
+    const adjustableControls = document.getElementById('adjustableControls');
+    
+    if (!adjustAnswersStep || !adjustableControls || !uploadedData || uploadedData.length === 0) {
+        showError('No data available for adjustment');
+        return;
+    }
+    
+    // Show the adjustment step
+    adjustAnswersStep.style.display = 'block';
+    adjustAnswersStep.scrollIntoView({ behavior: 'smooth' });
+    
+    // Get selected overlay type
+    const overlay = document.querySelector('input[name="overlay"]:checked')?.value;
+    if (!overlay) {
+        showError('Please select a Zero Trust Control Type');
+        return;
+    }
+    
+    const overlayControls = ZT_OVERLAYS[overlay];
+    
+    // Keep track of adjusted data
+    if (!window.adjustedData) {
+        window.adjustedData = JSON.parse(JSON.stringify(uploadedData));
+        // Store original status for comparison
+        window.adjustedData.forEach(item => {
+            item.originalStatus = item.status;
+        });
+    }
+    
+    // Initialize comments object if it doesn't exist
+    if (!window.adjustmentComments) {
+        window.adjustmentComments = {};
+    }
+    
+    // Populate controls for adjustment
+    populateAdjustableControlsList('all');
+    
+    // Add event listener to filter controls dropdown
+    const filterControls = document.getElementById('filterControls');
+    if (filterControls) {
+        filterControls.addEventListener('change', function() {
+            populateAdjustableControlsList(this.value);
+        });
+    }
+    
+    // Add event listener to save button
+    const saveAdjustmentsBtn = document.getElementById('saveAdjustmentsBtn');
+    if (saveAdjustmentsBtn) {
+        saveAdjustmentsBtn.addEventListener('click', saveAdjustments);
+    }
+}
+
+// Function to populate and display adjustable controls based on filter
+function populateAdjustableControlsList(filter) {
+    const adjustableControls = document.getElementById('adjustableControls');
+    if (!adjustableControls || !window.adjustedData) return;
+    
+    // Get selected overlay type
+    const overlay = document.querySelector('input[name="overlay"]:checked')?.value;
+    if (!overlay) return;
+    
+    const overlayControls = ZT_OVERLAYS[overlay];
+    
+    // Filter controls based on selected filter
+    let filteredControls = [...window.adjustedData];
+    
+    switch (filter) {
+        case 'compliant':
+            filteredControls = filteredControls.filter(control => control.status === 'Compliant');
+            break;
+        case 'non-compliant':
+            filteredControls = filteredControls.filter(control => control.status === 'Non-compliant');
+            break;
+        case 'inherited':
+            filteredControls = filteredControls.filter(control => control.status === 'Inherited');
+            break;
+        case 'na':
+            filteredControls = filteredControls.filter(control => control.status === 'N/A');
+            break;
+        default:
+            // All controls, no filtering
+            break;
+    }
+    
+    // Sort controls alphabetically by ID
+    filteredControls.sort((a, b) => a.controlId.localeCompare(b.controlId));
+    
+    // Generate HTML for controls
+    let html = '';
+    
+    if (filteredControls.length === 0) {
+        html = '<p class="info-text">No controls match the selected filter.</p>';
+    } else {
+        filteredControls.forEach(control => {
+            const controlInfo = overlayControls[control.controlId];
+            const controlName = controlInfo ? controlInfo.name : 'Unknown Control';
+            const controlFamily = controlInfo ? controlInfo.family : 'Uncategorized';
+            const controlId = control.controlId;
+            const currentStatus = control.status;
+            const comment = window.adjustmentComments[controlId] || '';
+            
+            html += `
+                <div class="adjustable-control" data-control-id="${controlId}">
+                    <div class="control-header">
+                        <span class="control-id">${controlId}</span>
+                        <span class="control-name">${controlName}</span>
+                        <span class="control-family">${controlFamily}</span>
+                    </div>
+                    <div class="control-body">
+                        <div class="status-group">
+                            <label>Status:</label>
+                            <select class="status-select" data-control-id="${controlId}">
+                                <option value="Compliant" ${currentStatus === 'Compliant' ? 'selected' : ''}>Compliant</option>
+                                <option value="Non-compliant" ${currentStatus === 'Non-compliant' ? 'selected' : ''}>Non-compliant</option>
+                                <option value="Inherited" ${currentStatus === 'Inherited' ? 'selected' : ''}>Inherited</option>
+                                <option value="N/A" ${currentStatus === 'N/A' ? 'selected' : ''}>N/A</option>
+                            </select>
+                            <div class="status-info ${control.originalStatus !== control.status ? 'modified' : ''}"> 
+                                ${control.originalStatus !== control.status ? 
+                                `<span class="original-status">Original: ${control.originalStatus}</span>` : 
+                                ''}
+                            </div>
+                        </div>
+                        <div class="comment-group">
+                            <label for="comment-${controlId}">Justification:</label>
+                            <textarea id="comment-${controlId}" 
+                                      data-control-id="${controlId}" 
+                                      class="comment-input" 
+                                      placeholder="Enter justification for any status changes...">${comment}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    adjustableControls.innerHTML = html;
+    
+    // Add event listeners to status selects
+    const statusSelects = adjustableControls.querySelectorAll('.status-select');
+    statusSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const controlId = this.dataset.controlId;
+            const newStatus = this.value;
+            
+            // Update status in adjustedData
+            const controlData = window.adjustedData.find(item => item.controlId === controlId);
+            if (controlData) {
+                controlData.status = newStatus;
+            }
+            
+            // Update status-info display
+            const statusInfo = this.parentElement.querySelector('.status-info');
+            if (statusInfo) {
+                if (controlData && controlData.originalStatus !== newStatus) {
+                    statusInfo.innerHTML = `<span class="original-status">Original: ${controlData.originalStatus}</span>`;
+                    statusInfo.classList.add('modified');
+                } else {
+                    statusInfo.innerHTML = '';
+                    statusInfo.classList.remove('modified');
+                }
+            }
+        });
+    });
+    
+    // Add event listeners to comment inputs
+    const commentInputs = adjustableControls.querySelectorAll('.comment-input');
+    commentInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const controlId = this.dataset.controlId;
+            window.adjustmentComments[controlId] = this.value;
+        });
+    });
+}
+
+// Function to save adjustments and proceed to the next step
+function saveAdjustments() {
+    if (!window.adjustedData) {
+        showError('No adjustments to save');
+        return;
+    }
+    
+    // Update uploadedData with adjusted data
+    uploadedData = [...window.adjustedData];
+    
+    // Store comments for later use (could be used in exports)
+    window.savedComments = {...window.adjustmentComments};
+    
+    // Set flag that adjustments have been applied
+    window.adjustmentsApplied = true;
+    
+    // Show success message
+    showSuccess('Adjustments saved successfully!');
+    
+    // Enable the process button
+    const processBtn = document.getElementById('processBtn');
+    if (processBtn) {
+        processBtn.disabled = false;
+    }
+    
+    // Smooth scroll to the process step
+    const processStep = document.getElementById('processStepTitle');
+    if (processStep) {
+        processStep.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 // Zero Trust Gap Analysis Tool - Part 2: Processing and Analysis
 // Based on provided Project.xlsx specifications
@@ -673,10 +897,12 @@ function normalizeStatus(status) {
 function updateAdditionalQuestions() {
     const selectedOverlay = document.querySelector('input[name="overlay"]:checked');
     const additionalQuestionsStep = document.getElementById('additionalQuestionsStep');
+    const adjustAnswersStep = document.getElementById('adjustAnswersStep');
     const processStepTitle = document.getElementById('processStepTitle');
     
     if (!selectedOverlay) {
         if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'none';
+        if (adjustAnswersStep) adjustAnswersStep.style.display = 'none';
         if (processStepTitle) processStepTitle.textContent = 'Step 4: Process Assessment';
         return;
     }
@@ -686,11 +912,11 @@ function updateAdditionalQuestions() {
     
     if (questions && questions.length > 0) {
         if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'block';
-        if (processStepTitle) processStepTitle.textContent = 'Step 5: Process Assessment';
+        if (processStepTitle) processStepTitle.textContent = 'Step 6: Process Assessment';
         renderAdditionalQuestions(questions);
     } else {
         if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'none';
-        if (processStepTitle) processStepTitle.textContent = 'Step 4: Process Assessment';
+        if (processStepTitle) processStepTitle.textContent = 'Step 5: Process Assessment';
     }
 }
 
@@ -716,6 +942,13 @@ function renderAdditionalQuestions(questions) {
         `;
     });
     
+    // Add a Next button to proceed to the adjustment step
+    html += `
+        <div class="form-actions" style="margin-top: 30px;">
+            <button id="proceedToAdjustBtn" class="btn btn-primary">Next: Review & Adjust Answers</button>
+        </div>
+    `;
+    
     additionalQuestions.innerHTML = html;
     
     // Add event listeners for additional questions
@@ -731,134 +964,22 @@ function renderAdditionalQuestions(questions) {
             }
         });
     });
-}
-
-// ===========================================
-// ANSWER ADJUSTMENT FUNCTIONALITY
-// ===========================================
-
-function populateAdjustableControls() {
-    const container = document.getElementById('adjustableControls');
-    if (!container || !uploadedData) return;
     
-    container.innerHTML = '';
-    
-    // Get selected overlay type
-    const overlayType = document.querySelector('input[name="overlay"]:checked')?.value;
-    if (!overlayType) return;
-    
-    // Get overlay controls
-    const overlayControls = ZT_OVERLAYS[overlayType];
-    
-    // Create adjustment UI for each control
-    Object.entries(uploadedData).forEach(([controlId, status]) => {
-        // Get control info if it exists in the overlay
-        const controlInfo = overlayControls[controlId] || { family: 'Unknown', name: controlId };
-        
-        const controlItem = document.createElement('div');
-        controlItem.className = 'control-item';
-        controlItem.dataset.controlId = controlId;
-        controlItem.dataset.status = status.toLowerCase();
-        
-        // Create control header
-        const header = document.createElement('div');
-        header.className = 'control-header';
-        
-        const idSpan = document.createElement('span');
-        idSpan.className = 'control-id';
-        idSpan.textContent = controlId;
-        
-        header.appendChild(idSpan);
-        controlItem.appendChild(header);
-        
-        // Control name
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'control-name';
-        nameDiv.textContent = controlInfo.name;
-        controlItem.appendChild(nameDiv);
-        
-        // Status selector
-        const statusSelector = document.createElement('div');
-        statusSelector.className = 'control-status-selector';
-        
-        const statuses = ['Compliant', 'Non-compliant', 'Inherited', 'N/A'];
-        statuses.forEach(statusOption => {
-            const label = document.createElement('label');
+    // Add event listener to the Next button
+    const proceedToAdjustBtn = document.getElementById('proceedToAdjustBtn');
+    if (proceedToAdjustBtn) {
+        proceedToAdjustBtn.addEventListener('click', function() {
+            // Check if we have at least one question answered
+            const answeredQuestions = Object.keys(additionalAnswers).length;
+            if (questions.length > 0 && answeredQuestions === 0) {
+                showError('Please answer at least one question before proceeding.');
+                return;
+            }
             
-            const radio = document.createElement('input');
-            radio.type = 'radio';
-            radio.name = `status-${controlId}`;
-            radio.value = statusOption.toLowerCase();
-            radio.checked = status.toLowerCase() === statusOption.toLowerCase();
-            radio.addEventListener('change', () => updateControlStatus(controlId, statusOption));
-            
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(statusOption));
-            statusSelector.appendChild(label);
+            // Proceed to adjustment step
+            populateAdjustableControls();
         });
-        
-        controlItem.appendChild(statusSelector);
-        
-        // Comment field
-        const commentField = document.createElement('div');
-        commentField.className = 'comment-field';
-        
-        const commentLabel = document.createElement('label');
-        commentLabel.textContent = 'Justification for adjustment:';
-        commentField.appendChild(commentLabel);
-        
-        const textarea = document.createElement('textarea');
-        textarea.placeholder = 'Enter justification for any status changes...';
-        textarea.value = adjustmentComments[controlId] || '';
-        textarea.addEventListener('input', () => {
-            adjustmentComments[controlId] = textarea.value;
-        });
-        
-        commentField.appendChild(textarea);
-        controlItem.appendChild(commentField);
-        
-        // Add to container
-        container.appendChild(controlItem);
-    });
-    
-    // Add filter functionality
-    document.getElementById('filterControls').addEventListener('change', filterAdjustableControls);
-}
-
-// Update control status when user changes it
-function updateControlStatus(controlId, newStatus) {
-    uploadedData[controlId] = newStatus;
-    
-    // Update data display
-    const controlItem = document.querySelector(`.control-item[data-control-id="${controlId}"]`);
-    if (controlItem) {
-        controlItem.dataset.status = newStatus.toLowerCase();
     }
-}
-
-// Filter controls based on selected status
-function filterAdjustableControls() {
-    const filterValue = document.getElementById('filterControls').value;
-    const controls = document.querySelectorAll('.control-item');
-    
-    controls.forEach(control => {
-        if (filterValue === 'all' || control.dataset.status.toLowerCase() === filterValue) {
-            control.style.display = 'block';
-        } else {
-            control.style.display = 'none';
-        }
-    });
-}
-
-// Save adjustments
-function saveAdjustments() {
-    // Store adjustment comments for reporting
-    localStorage.setItem('zt_adjustment_comments', JSON.stringify(adjustmentComments));
-    
-    showSuccess('Adjustments saved successfully!');
-    
-    // Enable process button
-    checkFormReady();
 }
 
 // ===========================================
@@ -879,7 +1000,11 @@ function checkFormReady() {
         additionalQuestionsAnswered = questions.every(q => additionalAnswers[q.id]);
     }
     
-    const isReady = agency && overlay && hasFile && additionalQuestionsAnswered;
+    // If adjustments have been applied, override other conditions
+    let isReady = agency && overlay && hasFile && additionalQuestionsAnswered;
+    if (window.adjustmentsApplied) {
+        isReady = true;
+    }
     
     const processBtn = document.getElementById('processBtn');
     if (processBtn) processBtn.disabled = !isReady;
@@ -893,10 +1018,12 @@ function checkFormReady() {
             btnText.textContent = '⚠️ Select Control Type';
         } else if (!hasFile) {
             btnText.textContent = '⚠️ Upload CSV File';
-        } else if (!additionalQuestionsAnswered) {
+        } else if (!additionalQuestionsAnswered && !window.adjustmentsApplied) {
             btnText.textContent = '⚠️ Answer Additional Questions';
-        } else {
+        } else if (window.adjustmentsApplied) {
             btnText.textContent = '🔄 Process Assessment';
+        } else {
+            btnText.textContent = '⚠️ Review & Adjust Controls';
         }
     }
 }
@@ -927,26 +1054,13 @@ function processAssessment() {
             clearInterval(progressInterval);
             if (progressFill) progressFill.style.width = '100%';
             
-            const overlayInput = document.querySelector('input[name="overlay"]:checked');
-            if (!overlayInput) {
-                throw new Error('No overlay selected');
-            }
-            
-            const overlay = overlayInput.value;
-            console.log('Selected overlay:', overlay);
-            
+            const overlay = document.querySelector('input[name="overlay"]:checked').value;
             const overlayControls = ZT_OVERLAYS[overlay];
-            if (!overlayControls) {
-                throw new Error(`Invalid overlay type: ${overlay}. Available overlays: ${Object.keys(ZT_OVERLAYS).join(', ')}`);
-            }
             
-            console.log('Overlay controls:', {
-                type: overlay,
-                controlCount: Object.keys(overlayControls).length,
-                sampleControls: Object.keys(overlayControls).slice(0, 3)
-            });
+            // Use adjusted data if available, otherwise use the original upload data
+            const dataToProcess = window.adjustedData || uploadedData;
             
-            processedResults = analyzeCompliance(uploadedData, overlayControls, overlay);
+            processedResults = analyzeCompliance(dataToProcess, overlayControls, overlay);
             
             hideLoading();
             displayResults(processedResults);
@@ -960,277 +1074,206 @@ function processAssessment() {
         } catch (err) {
             clearInterval(progressInterval);
             hideLoading();
-            const errorMessage = err.message || 'Unknown error';
-            showError('Error processing assessment: ' + errorMessage);
-            console.error('Processing error:', {
-                message: errorMessage,
-                stack: err.stack,
-                data: {
-                    uploadedDataLength: uploadedData ? uploadedData.length : 0,
-                    overlay: document.querySelector('input[name="overlay"]:checked')?.value
-                }
-            });
+            showError('Error processing assessment: ' + err.message);
+            console.error('Processing error:', err);
         }
     }, 2000);
 }
 
 function analyzeCompliance(data, overlayControls, overlayType) {
-    try {
-        // Validate inputs
-        if (!data || !Array.isArray(data) || data.length === 0) {
-            throw new Error('Invalid or empty assessment data');
-        }
-        
-        if (!overlayControls || typeof overlayControls !== 'object') {
-            throw new Error('Invalid overlay controls');
-        }
-        
-        if (!overlayType || typeof overlayType !== 'string') {
-            throw new Error('Invalid overlay type');
-        }
-        
-        // Log input data for debugging
-        console.log('analyzeCompliance inputs:', {
-            dataLength: data.length,
-            dataSample: data.slice(0, 3),
-            overlayType: overlayType,
-            overlayControlsCount: Object.keys(overlayControls).length,
-            overlayControlsSample: Object.keys(overlayControls).slice(0, 3).map(key => ({ key, value: overlayControls[key] }))
-        });
-        
-        const agencySelect = document.getElementById('agencySelect');
+    // Initialize result structure
+    const results = {
+        overlayType: overlayType,
+        total: 0,
+        compliant: 0,
+        nonCompliant: 0,
+        inherited: 0,
+        na: 0,
+        // Initialize pillar breakdown instead of family breakdown
+        pillarBreakdown: {},
+        details: [], // Initialize details array
+        criticalGaps: [], // Initialize criticalGaps array
+        additionalAnswers: additionalAnswers,
+        date: new Date().toLocaleDateString(),
+        agency: document.getElementById('agencySelect').value || 'Unknown',
+        adjustmentComments: window.savedComments || {}
+    };
     
-        // Initialize results object
-        const results = {
-            total: 0,
+    // Initialize pillar breakdown structure
+    Object.keys(ZT_PILLARS).forEach(pillarId => {
+        results.pillarBreakdown[pillarId] = {
+            name: ZT_PILLARS[pillarId].name,
+            description: ZT_PILLARS[pillarId].description,
             compliant: 0,
             nonCompliant: 0,
             inherited: 0,
             na: 0,
-            complianceScore: 0,
-            familyBreakdown: {},
-            controlDetails: {},
-            ztControlBreakdown: {},
-            pillarBreakdown: {},
-            agency: agencySelect ? agencySelect.value : 'Unknown',
-            overlayType: overlayType, // Ensure overlayType is stored in results
-            processedDate: new Date().toISOString(),
-            details: [],
-            criticalGaps: []
+            total: 0
         };
-    
-        // Initialize Zero Trust pillars
-        const pillars = [
-            'User',
-            'Device',
-            'Application & Workload',
-            'Data',
-            'Network & Environment',
-            'Automation & Orchestration',
-            'Visibility & Analytics'
-        ];
-    
-        pillars.forEach(pillar => {
-            results.pillarBreakdown[pillar] = {
-                total: 0,
-                compliant: 0,
-                nonCompliant: 0,
-                inherited: 0,
-                na: 0,
-                complianceScore: 0
-            };
-        });
-    
-        // Initialize ZT control status tracking
-        const ztControlStatus = {};
-        Object.keys(ZT_TO_RMF_MAPPING).forEach(ztControlId => {
-            ztControlStatus[ztControlId] = {
-                rmfControls: [],
-                status: 'compliant', // Default to compliant, will be changed if any RMF control is non-compliant
-                totalControls: 0,
-                applicableControls: 0 // Excluding N/A controls
-            };
-        });
+    });
 
-        // Add additional answers to results
-        results.additionalAnswers = { ...additionalAnswers };
-
-        // Create a map of user controls for quick lookup
-        const userControls = {};
-        data.forEach(item => {
-            userControls[item.controlId] = item;
-        });
-
-    // Analyze each required overlay control
-    Object.keys(overlayControls).forEach(controlId => {
-        const controlInfo = overlayControls[controlId];
-        const userControl = userControls[controlId];
-        const userStatus = userControl ? userControl.status : 'Non-compliant';
+    
+    // This mapping defines which RMF controls affect which Zero Trust controls
+    // In a real implementation, this would be loaded from a configuration file
+    // Format: { 'ZT-CONTROL-ID': ['RMF-CONTROL-1', 'RMF-CONTROL-2', ...] }
+    const ZT_TO_RMF_MAPPING = {
+        // This is a simplified example mapping - in production this would be comprehensive
+        'ZT-1.1.1': ['AC-2', 'AC-3', 'AC-6', 'IA-2', 'IA-4'],
+        'ZT-1.2.1': ['AC-17', 'IA-2', 'IA-5', 'IA-8'],
+        'ZT-1.3.1': ['AC-3', 'AC-6', 'AC-24'],
+        'ZT-2.1.1': ['CM-8', 'CA-9', 'SC-28'],
+        'ZT-2.2.1': ['CM-2', 'CM-6', 'CM-7', 'SI-7'],
+        'ZT-3.1.1': ['SC-7', 'SC-8', 'SC-13', 'AC-4'],
+        'ZT-3.2.1': ['AC-3', 'AC-4', 'AC-16(2)', 'SC-7'],  // AC-16(2) affects this ZT control
+        'ZT-4.1.1': ['MP-4', 'SC-28', 'AC-16', 'AC-16(2)'], // AC-16(2) affects this ZT control too
+        'ZT-5.1.1': ['AU-2', 'AU-3', 'AU-6', 'AU-12', 'SI-4']
+    };
+    
+    // Create a map of user-provided RMF controls for quick lookup
+    const userRMFControls = {};
+    data.forEach(item => {
+        userRMFControls[item.controlId] = item;
+    });
+    
+    // First, process each Zero Trust control based on its associated RMF controls
+    Object.keys(ZT_TO_RMF_MAPPING).forEach(ztControlId => {
+        const associatedRMFControls = ZT_TO_RMF_MAPPING[ztControlId];
+        let ztControlStatus = 'Compliant'; // Start assuming compliant
+        let totalAssociatedControls = 0;
+        let naCount = 0;
         
+        // Collect relevant RMF control statuses
+        const rmfStatuses = [];
+        
+        // Track each associated RMF control for reporting
+        const rmfControlDetails = [];
+        
+        // Check each associated RMF control
+        associatedRMFControls.forEach(rmfControlId => {
+            const rmfControl = userRMFControls[rmfControlId];
+            
+            // If the RMF control exists in the user data
+            if (rmfControl) {
+                const status = rmfControl.status;
+                
+                // Track the control and its status
+                rmfControlDetails.push({
+                    controlId: rmfControlId,
+                    status: status,
+                    originalStatus: rmfControl.originalStatus || status
+                });
+                
+                // Skip N/A controls in compliance calculation
+                if (status === 'N/A') {
+                    naCount++;
+                } else {
+                    totalAssociatedControls++;
+                    rmfStatuses.push(status);
+                    
+                    // If any associated control is non-compliant, the entire ZT control is non-compliant
+                    if (status === 'Non-compliant') {
+                        ztControlStatus = 'Non-compliant';
+                    }
+                }
+            } else {
+                // If the control is missing, consider it non-compliant by default
+                rmfControlDetails.push({
+                    controlId: rmfControlId,
+                    status: 'Non-compliant',
+                    originalStatus: 'Not Assessed'
+                });
+                totalAssociatedControls++;
+                rmfStatuses.push('Non-compliant');
+                
+                // Missing control makes the ZT control non-compliant
+                ztControlStatus = 'Non-compliant';
+            }
+        });
+        
+        // If all associated controls are N/A, mark the ZT control as N/A
+        if (totalAssociatedControls === 0 && naCount > 0) {
+            ztControlStatus = 'N/A';
+        }
+        
+        // Extract ZT control info from the overlayControls
+        const controlInfo = overlayControls[ztControlId] || {
+            name: ztControlId,
+            family: 'Unknown',
+            description: 'No description available'
+        };
+        
+        // Create the ZT control detail
         const detail = {
-            controlId: controlId,
-            controlName: controlInfo.name,
-            family: controlInfo.family,
-            userStatus: userStatus,
-            originalStatus: userControl ? userControl.originalStatus : 'Not Assessed',
+            controlId: ztControlId,
+            controlName: controlInfo.name || ztControlId,
+            pillar: findPillarForControl(ztControlId), // Assign Zero Trust pillar instead of family
+            userStatus: ztControlStatus,
             required: true,
-            isGap: userStatus === 'Non-compliant'
+            isGap: ztControlStatus === 'Non-compliant',
+            rmfControls: rmfControlDetails  // Store associated RMF controls and their statuses
         };
         
         results.details.push(detail);
-
+        
         // Count by status
-        const family = controlInfo.family;
-        
-        // Initialize family if not exists
-        if (!results.familyBreakdown[family]) {
-            results.familyBreakdown[family] = {
-                total: 0,
-                compliant: 0,
-                nonCompliant: 0,
-                inherited: 0,
-                na: 0,
-                complianceScore: 0
-            };
-        }
-        
-        // Normalize status
-        const normalizedStatus = normalizeStatus(userStatus);
-        
-        // Update RMF control counts
-        results.total++;
-        results.familyBreakdown[family].total++;
-        
-        switch (normalizedStatus) {
-            case 'compliant':
+        switch (ztControlStatus) {
+            case 'Compliant':
                 results.compliant++;
-                results.familyBreakdown[family].compliant++;
                 break;
-            case 'non-compliant':
+            case 'Non-compliant':
                 results.nonCompliant++;
-                results.familyBreakdown[family].nonCompliant++;
+                results.criticalGaps.push(detail);
                 break;
-            case 'inherited':
+            case 'Inherited':
                 results.inherited++;
-                results.familyBreakdown[family].inherited++;
                 break;
-            case 'n/a':
+            case 'N/A':
                 results.na++;
-                results.familyBreakdown[family].na++;
                 break;
         }
         
-        // Store control details
-        results.controlDetails[controlId] = {
-            id: controlId,
-            name: controlInfo.name,
-            family: family,
-            status: normalizedStatus
-        };
+        results.total++;
         
-        // Map RMF control to Zero Trust controls
-        for (const [ztControlId, rmfControls] of Object.entries(ZT_TO_RMF_MAPPING)) {
-            if (rmfControls.includes(controlId)) {
-                ztControlStatus[ztControlId].rmfControls.push({
-                    id: controlId,
-                    status: normalizedStatus
-                });
-                
-                ztControlStatus[ztControlId].totalControls++;
-                
-                // Count applicable controls (not N/A)
-                if (normalizedStatus !== 'n/a') {
-                    ztControlStatus[ztControlId].applicableControls++;
-                    
-                    // If any RMF control is non-compliant, the entire ZT control is non-compliant
-                    if (normalizedStatus === 'non-compliant') {
-                        ztControlStatus[ztControlId].status = 'non-compliant';
-                    }
-                }
-            }
+        // Update pillar breakdown
+        const pillarId = detail.pillar.id; // Get pillar ID
+        
+        // Map status to property name for pillar breakdown
+        let statusKey;
+        switch (ztControlStatus) {
+            case 'Compliant':
+                statusKey = 'compliant';
+                break;
+            case 'Non-compliant':
+                statusKey = 'nonCompliant';
+                break;
+            case 'Inherited':
+                statusKey = 'inherited';
+                break;
+            case 'N/A':
+                statusKey = 'na';
+                break;
+            default:
+                statusKey = 'nonCompliant';
+        }
+        
+        // Update pillar statistics
+        if (results.pillarBreakdown[pillarId]) {
+            results.pillarBreakdown[pillarId][statusKey]++;
+            results.pillarBreakdown[pillarId].total++;
         }
     });
     
-    // Calculate compliance scores for RMF controls
-    // Formula: (Compliant + Inherited) / (Total - N/A) * 100
-    const totalMinusNA = results.total - results.na;
-    if (totalMinusNA > 0) {
-        results.complianceScore = ((results.compliant + results.inherited) / totalMinusNA) * 100;
-    }
-    
-    // Calculate family compliance scores
-    Object.keys(results.familyBreakdown).forEach(family => {
-        const familyData = results.familyBreakdown[family];
-        const familyTotalMinusNA = familyData.total - familyData.na;
-        
-        if (familyTotalMinusNA > 0) {
-            familyData.complianceScore = ((familyData.compliant + familyData.inherited) / familyTotalMinusNA) * 100;
-        }
-    });
-    
-    // Process Zero Trust controls and map them to pillars
-    Object.entries(ztControlStatus).forEach(([ztControlId, ztControl]) => {
-        // Skip if no applicable controls
-        if (ztControl.applicableControls === 0) return;
-        
-        // Get the pillar for this ZT control
-        const pillar = ZT_CONTROL_TO_PILLAR[ztControlId] || 'Unknown';
-        
-        // Initialize ZT control breakdown if not exists
-        if (!results.ztControlBreakdown[ztControlId]) {
-            results.ztControlBreakdown[ztControlId] = {
-                id: ztControlId,
-                pillar: pillar,
-                status: ztControl.status,
-                rmfControls: ztControl.rmfControls
-            };
-        }
-        
-        // Update pillar counts
-        if (pillar !== 'Unknown' && results.pillarBreakdown[pillar]) {
-            results.pillarBreakdown[pillar].total++;
-            
-            switch (ztControl.status) {
-                case 'compliant':
-                    results.pillarBreakdown[pillar].compliant++;
-                    break;
-                case 'non-compliant':
-                    results.pillarBreakdown[pillar].nonCompliant++;
-                    break;
-                case 'inherited':
-                    results.pillarBreakdown[pillar].inherited++;
-                    break;
-                case 'n/a':
-                    results.pillarBreakdown[pillar].na++;
-                    break;
-            }
-        }
-    });
-    
-    // Calculate pillar compliance scores
-    Object.keys(results.pillarBreakdown).forEach(pillar => {
-        const pillarData = results.pillarBreakdown[pillar];
-        const pillarTotalMinusNA = pillarData.total - pillarData.na;
-        
-        if (pillarTotalMinusNA > 0) {
-            pillarData.complianceScore = ((pillarData.compliant + pillarData.inherited) / pillarTotalMinusNA) * 100;
-        }
-    });
-    
-        return results;
-    } catch (error) {
-        console.error('Error in analyzeCompliance:', {
-            message: error.message || 'Unknown error',
-            stack: error.stack,
-            data: {
-                dataLength: data ? data.length : 0,
-                overlayType: overlayType || 'undefined'
-            }
-        });
-        throw error; // Re-throw to be handled by caller
-    }
-}
+    // Calculate compliance percentage (Compliant + Inherited vs effective total)
+    // N/A controls are excluded from the calculation
+    const effectiveTotal = results.total - results.na;
+    const effectiveCompliant = results.compliant + results.inherited;
+    results.compliancePercentage = effectiveTotal > 0 ? Math.round((effectiveCompliant / effectiveTotal) * 100) : 0;
+    results.effectiveTotal = effectiveTotal;
+    results.effectiveCompliant = effectiveCompliant;
 
+    return results;
+}
+// ===========================================
 // RESULTS DISPLAY
 // ===========================================
 
@@ -1238,8 +1281,7 @@ function displayResults(results) {
     updateStatistics(results);
     updateComplianceScore(results);
     createComplianceChart(results);
-    createFamilyChart(results);
-    createPillarChart(results);
+    createPillarChart(results); // Changed from createFamilyChart to createPillarChart
     displayDetailedAnalysis(results);
 }
 
@@ -1277,26 +1319,11 @@ function updateComplianceScore(results) {
     const effectiveCompliant = document.getElementById('effectiveCompliant');
     const effectiveTotal = document.getElementById('effectiveTotal');
 
-    // Calculate compliance percentage if it doesn't exist
-    if (results.complianceScore !== undefined) {
-        // Use complianceScore from the updated calculation
-        var percentage = results.complianceScore.toFixed(1);
-    } else if (results.compliancePercentage !== undefined) {
-        // Use legacy compliancePercentage if available
-        var percentage = results.compliancePercentage.toFixed(1);
-    } else {
-        // Calculate it if neither is available
-        const totalMinusNA = results.total - (results.na || 0);
-        var percentage = totalMinusNA > 0 ? 
-            (((results.compliant || 0) + (results.inherited || 0)) / totalMinusNA * 100).toFixed(1) : 
-            '0.0';
-    }
+    const percentage = results.compliancePercentage.toFixed(1);
     
     if (overallScore) overallScore.textContent = `${percentage}%`;
-    if (effectiveCompliant) effectiveCompliant.textContent = results.effectiveCompliant || 
-        ((results.compliant || 0) + (results.inherited || 0));
-    if (effectiveTotal) effectiveTotal.textContent = results.effectiveTotal || 
-        ((results.total || 0) - (results.na || 0));
+    if (effectiveCompliant) effectiveCompliant.textContent = results.effectiveCompliant;
+    if (effectiveTotal) effectiveTotal.textContent = results.effectiveTotal;
     
     // Update score circle color based on compliance level
     if (scoreCircle) {
@@ -1351,7 +1378,7 @@ function createComplianceChart(results) {
             plugins: {
                 title: {
                     display: true,
-                    text: `${results.agency} - ${results.overlayType ? results.overlayType.toUpperCase() : 'STANDARD'} ZT Controls`,
+                    text: `${results.agency} - ${results.overlayType.toUpperCase()} ZT Controls`,
                     font: { size: 16, weight: 'bold' }
                 },
                 legend: {
@@ -1387,23 +1414,24 @@ function createComplianceChart(results) {
     });
 }
 
-function createFamilyChart(results) {
-    const ctx = document.getElementById('familyChart');
+function createPillarChart(results) {
+    const ctx = document.getElementById('pillarChart'); // Updated from familyChart
     if (!ctx) return;
     
     // Destroy existing chart
-    if (familyChart) {
-        familyChart.destroy();
+    if (pillarChart) {
+        pillarChart.destroy();
     }
 
-    // Prepare family data
-    const families = Object.keys(results.familyBreakdown);
-    const familyData = families.map(family => {
-        const breakdown = results.familyBreakdown[family];
+    // Prepare pillar data
+    const pillars = Object.keys(results.pillarBreakdown);
+    const pillarData = pillars.map(pillarId => {
+        const breakdown = results.pillarBreakdown[pillarId];
         const compliantPercent = breakdown.total > 0 ? 
             ((breakdown.compliant + breakdown.inherited) / breakdown.total) * 100 : 0;
         return {
-            family: family.length > 25 ? family.substring(0, 25) + '...' : family,
+            pillarId: pillarId,
+            pillarName: `${pillarId}: ${breakdown.name}`,
             compliant: breakdown.compliant,
             nonCompliant: breakdown.nonCompliant,
             inherited: breakdown.inherited,
@@ -1413,35 +1441,35 @@ function createFamilyChart(results) {
         };
     });
 
-    // Sort by compliance percentage (descending)
-    familyData.sort((a, b) => b.compliancePercent - a.compliancePercent);
+    // Sort by pillar ID to maintain consistent order
+    pillarData.sort((a, b) => a.pillarId.localeCompare(b.pillarId));
 
-    familyChart = new Chart(ctx.getContext('2d'), {
+    pillarChart = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
-            labels: familyData.map(item => item.family),
+            labels: pillarData.map(item => item.pillarName),
             datasets: [
                 {
                     label: 'Compliant',
-                    data: familyData.map(item => item.compliant),
+                    data: pillarData.map(item => item.compliant),
                     backgroundColor: '#28a745',
                     borderWidth: 1
                 },
                 {
                     label: 'Inherited',
-                    data: familyData.map(item => item.inherited),
+                    data: pillarData.map(item => item.inherited),
                     backgroundColor: '#17a2b8',
                     borderWidth: 1
                 },
                 {
                     label: 'Non-Compliant',
-                    data: familyData.map(item => item.nonCompliant),
+                    data: pillarData.map(item => item.nonCompliant),
                     backgroundColor: '#dc3545',
                     borderWidth: 1
                 },
                 {
                     label: 'N/A',
-                    data: familyData.map(item => item.na),
+                    data: pillarData.map(item => item.na),
                     backgroundColor: '#6c757d',
                     borderWidth: 1
                 }
@@ -1469,7 +1497,7 @@ function createFamilyChart(results) {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Control Family Compliance Breakdown',
+                    text: 'Zero Trust Pillar Compliance Breakdown',
                     font: { size: 16, weight: 'bold' }
                 },
                 legend: {
@@ -1479,114 +1507,9 @@ function createFamilyChart(results) {
                     callbacks: {
                         footer: function(tooltipItems) {
                             const index = tooltipItems[0].dataIndex;
-                            const item = familyData[index];
+                            const item = pillarData[index];
                             return `Overall: ${item.compliancePercent.toFixed(1)}% compliant`;
                         }
-                    }
-                }
-            }
-        }
-    });
-}
-
-function createPillarChart(results) {
-    const ctx = document.getElementById('pillarChart');
-    if (!ctx) return;
-    
-    // Destroy existing chart
-    if (pillarChart) {
-        pillarChart.destroy();
-    }
-    
-    // Get pillars from the results
-    const pillars = Object.keys(results.pillarBreakdown);
-    
-    // Prepare data arrays for each status
-    const compliantData = [];
-    const nonCompliantData = [];
-    const inheritedData = [];
-    const naData = [];
-    
-    // Populate data arrays
-    pillars.forEach(pillar => {
-        const pillarData = results.pillarBreakdown[pillar];
-        compliantData.push(pillarData.compliant);
-        nonCompliantData.push(pillarData.nonCompliant);
-        inheritedData.push(pillarData.inherited);
-        naData.push(pillarData.na);
-    });
-    
-    // Create stacked bar chart
-    pillarChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: pillars,
-            datasets: [
-                {
-                    label: 'Compliant',
-                    data: compliantData,
-                    backgroundColor: '#28a745',
-                    borderColor: '#1e7e34',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Non-Compliant',
-                    data: nonCompliantData,
-                    backgroundColor: '#dc3545',
-                    borderColor: '#bd2130',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Inherited',
-                    data: inheritedData,
-                    backgroundColor: '#17a2b8',
-                    borderColor: '#138496',
-                    borderWidth: 1
-                },
-                {
-                    label: 'N/A',
-                    data: naData,
-                    backgroundColor: '#6c757d',
-                    borderColor: '#5a6268',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Zero Trust Pillars Compliance',
-                    font: { size: 16 }
-                },
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw;
-                            const datasetLabel = context.dataset.label;
-                            return `${datasetLabel}: ${value}`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    stacked: true,
-                    title: {
-                        display: true,
-                        text: 'Zero Trust Pillars'
-                    }
-                },
-                y: {
-                    stacked: true,
-                    title: {
-                        display: true,
-                        text: 'Number of Controls'
                     }
                 }
             }
@@ -1600,6 +1523,9 @@ function displayDetailedAnalysis(results) {
     
     // Store all controls for filtering
     window.allControls = results.details;
+    
+    // Store results for access to comments in filter function
+    window.analysisResults = results;
     
     // Display all controls initially
     filterControlsList('all');
@@ -1624,30 +1550,57 @@ function filterControlsList(filter) {
             break;
     }
 
-    // Sort by family then by control ID
+    // Sort by pillar then by control ID
     filteredControls.sort((a, b) => {
-        if (a.family !== b.family) {
-            return a.family.localeCompare(b.family);
+        if (a.pillar.id !== b.pillar.id) {
+            return a.pillar.id.localeCompare(b.pillar.id);
         }
         return a.controlId.localeCompare(b.controlId);
     });
 
     // Render controls list
     let html = '';
-    let currentFamily = '';
+    let currentPillarId = '';
 
     if (filteredControls.length === 0) {
         html = '<div style="text-align: center; padding: 40px; color: #6c757d;">No controls match the selected filter.</div>';
     } else {
         filteredControls.forEach(control => {
-            // Add family header
-            if (control.family !== currentFamily) {
-                currentFamily = control.family;
-                html += `<div style="background: #f8f9fa; padding: 10px 20px; font-weight: 600; color: #495057; border-bottom: 2px solid #dee2e6;">${currentFamily}</div>`;
+            // Add pillar header
+            if (control.pillar.id !== currentPillarId) {
+                currentPillarId = control.pillar.id;
+                const pillarName = `${currentPillarId}: ${control.pillar.name}`;
+                html += `<div style="background: #f1f8ff; padding: 10px 20px; font-weight: 600; color: #0d47a1; border-bottom: 2px solid #90caf9;">${pillarName}</div>`;
             }
 
             const statusClass = `status-${control.userStatus.toLowerCase().replace('-', '-')}`;
             const statusIcon = getStatusIcon(control.userStatus);
+
+            // Check if there's an adjustment comment for this control
+            const hasComment = window.analysisResults && window.analysisResults.adjustmentComments && 
+                            window.analysisResults.adjustmentComments[control.controlId];
+            const comment = hasComment ? window.analysisResults.adjustmentComments[control.controlId] : '';
+            
+            // Generate HTML for RMF controls if they exist
+            let rmfControlsHtml = '';
+            if (control.rmfControls && control.rmfControls.length > 0) {
+                rmfControlsHtml = `
+                    <div class="rmf-controls">
+                        <div class="rmf-controls-header">Associated RMF Controls:</div>
+                        <div class="rmf-controls-list">
+                            ${control.rmfControls.map(rmf => {
+                                const rmfStatusClass = `status-${rmf.status.toLowerCase().replace('-', '-')}`;
+                                const rmfStatusIcon = getStatusIcon(rmf.status);
+                                return `<div class="rmf-control-item">
+                                    <span class="rmf-control-id">${rmf.controlId}</span>
+                                    <span class="rmf-control-status ${rmfStatusClass}">${rmfStatusIcon} ${rmf.status}</span>
+                                    ${rmf.originalStatus !== rmf.status ? `<small style="color: #6c757d;">Original: ${rmf.originalStatus}</small>` : ''}
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
 
             html += `
                 <div class="control-item">
@@ -1655,6 +1608,12 @@ function filterControlsList(filter) {
                         <div class="control-id">${control.controlId}</div>
                         <div class="control-name">${control.controlName}</div>
                         ${control.originalStatus !== control.userStatus ? `<small style="color: #6c757d;">Original: ${control.originalStatus}</small>` : ''}
+                        ${hasComment ? `
+                            <div class="adjustment-comment">
+                                <strong>Justification:</strong> ${comment}
+                            </div>
+                        ` : ''}
+                        ${rmfControlsHtml}
                     </div>
                     <div class="control-status ${statusClass}">
                         ${statusIcon} ${control.userStatus}
@@ -1675,6 +1634,24 @@ function getStatusIcon(status) {
         case 'N/A': return '➖';
         default: return '❓';
     }
+}
+
+// Function to find which pillar a control belongs to
+function findPillarForControl(controlId) {
+    for (const pillarId in ZT_PILLARS) {
+        if (ZT_PILLARS[pillarId].controls.includes(controlId)) {
+            return {
+                id: pillarId,
+                name: ZT_PILLARS[pillarId].name
+            };
+        }
+    }
+    
+    // Default to Pillar 7 (Visibility & Analytics) if not found
+    return {
+        id: 'Pillar 7',
+        name: ZT_PILLARS['Pillar 7'].name
+    };
 }
 
 // ===========================================
@@ -1803,13 +1780,17 @@ function generateRawCSV() {
     return csv;
 }
 
-// Generate Adjusted CSV - Shows any manual adjustments
+// Generate Adjusted CSV - Shows any manual adjustments with comments
 function generateAdjustedCSV() {
-    let csv = 'Control ID,User Status,Original Status,Adjusted\n';
+    let csv = 'Control ID,User Status,Original Status,Adjusted,Justification Comment\n';
     
     processedResults.details.forEach(detail => {
         const adjusted = detail.originalStatus !== detail.userStatus ? 'Yes' : 'No';
-        csv += `"${detail.controlId}","${detail.userStatus}","${detail.originalStatus}","${adjusted}"\n`;
+        // Get comment if available
+        const comment = processedResults.adjustmentComments && processedResults.adjustmentComments[detail.controlId] || '';
+        // Escape any quotes in the comment
+        const escapedComment = comment.replace(/"/g, '""');
+        csv += `"${detail.controlId}","${detail.userStatus}","${detail.originalStatus}","${adjusted}","${escapedComment}"\n`;
     });
     
     return csv;
