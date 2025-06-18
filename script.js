@@ -1081,6 +1081,9 @@ function processAssessment() {
 }
 
 function analyzeCompliance(data, overlayControls, overlayType) {
+    console.log('Starting compliance analysis for:', overlayType);
+    console.log('Data records:', data.length);
+    
     // Initialize result structure
     const results = {
         overlayType: overlayType,
@@ -1114,20 +1117,48 @@ function analyzeCompliance(data, overlayControls, overlayType) {
 
     
     // This mapping defines which RMF controls affect which Zero Trust controls
-    // In a real implementation, this would be loaded from a configuration file
     // Format: { 'ZT-CONTROL-ID': ['RMF-CONTROL-1', 'RMF-CONTROL-2', ...] }
     const ZT_TO_RMF_MAPPING = {
-        // This is a simplified example mapping - in production this would be comprehensive
+        // Pillar 1 - User
         'ZT-1.1.1': ['AC-2', 'AC-3', 'AC-6', 'IA-2', 'IA-4'],
         'ZT-1.2.1': ['AC-17', 'IA-2', 'IA-5', 'IA-8'],
         'ZT-1.3.1': ['AC-3', 'AC-6', 'AC-24'],
+        
+        // Pillar 2 - Device
         'ZT-2.1.1': ['CM-8', 'CA-9', 'SC-28'],
         'ZT-2.2.1': ['CM-2', 'CM-6', 'CM-7', 'SI-7'],
+        
+        // Pillar 3 - Application & Workload
         'ZT-3.1.1': ['SC-7', 'SC-8', 'SC-13', 'AC-4'],
-        'ZT-3.2.1': ['AC-3', 'AC-4', 'AC-16(2)', 'SC-7'],  // AC-16(2) affects this ZT control
-        'ZT-4.1.1': ['MP-4', 'SC-28', 'AC-16', 'AC-16(2)'], // AC-16(2) affects this ZT control too
-        'ZT-5.1.1': ['AU-2', 'AU-3', 'AU-6', 'AU-12', 'SI-4']
+        'ZT-3.2.1': ['AC-3', 'AC-4', 'AC-16', 'SC-7'],
+        
+        // Pillar 4 - Data
+        'ZT-4.1.1': ['MP-4', 'SC-28', 'AC-16', 'SC-8'],
+        
+        // Pillar 5 - Network & Environment
+        'ZT-5.1.1': ['AU-2', 'AU-3', 'AU-6', 'AU-12', 'SI-4'],
+        
+        // Add some additional controls for advanced overlay
+        'ZT-1.4.1': ['IA-5', 'IA-7', 'SC-13'],  // Advanced authentication methods
+        'ZT-2.3.1': ['CM-2', 'CM-8', 'SI-3'],   // Advanced device security
+        'ZT-3.3.1': ['SC-7', 'SC-8', 'SI-4'],   // Advanced application monitoring
+        'ZT-5.2.1': ['AU-6', 'SI-4', 'AU-9']    // Advanced network monitoring
     };
+    
+    // Make sure ZT control lists are updated in ZT_PILLARS
+    Object.keys(ZT_TO_RMF_MAPPING).forEach(ztControl => {
+        const pillarNumber = parseInt(ztControl.split('-')[1].split('.')[0]);
+        const pillarId = `Pillar ${pillarNumber}`;
+        
+        if (ZT_PILLARS[pillarId] && !ZT_PILLARS[pillarId].controls.includes(ztControl)) {
+            ZT_PILLARS[pillarId].controls.push(ztControl);
+        }
+    });
+    
+    // Debugging
+    console.log('ZT_TO_RMF_MAPPING:', Object.keys(ZT_TO_RMF_MAPPING).length, 'ZT controls mapped');
+    console.log('Updated ZT_PILLARS controls:', 
+               Object.keys(ZT_PILLARS).map(p => `${p}: ${ZT_PILLARS[p].controls.length} controls`).join(', '));
     
     // Create a map of user-provided RMF controls for quick lookup
     const userRMFControls = {};
@@ -1263,6 +1294,102 @@ function analyzeCompliance(data, overlayControls, overlayType) {
         }
     });
     
+    // Process additional questions and include them in compliance metrics
+    // This is where we'll integrate the additional question responses
+    if (Object.keys(additionalAnswers).length > 0) {
+        console.log('Processing additional questions:', additionalAnswers);
+        
+        // Create a separate section for additional questions in the results
+        results.additionalQuestionsResults = {
+            compliant: 0,
+            nonCompliant: 0,
+            na: 0,
+            inherited: 0,
+            total: 0
+        };
+        
+        // Process each answer and update the counts
+        Object.keys(additionalAnswers).forEach(questionId => {
+            const answer = additionalAnswers[questionId];
+            let questionPillar = '';
+            
+            // Determine which pillar this question belongs to based on the question ID
+            if (questionId.startsWith('target_q')) {
+                // Extract pillar number from question ID if possible, default to Pillar 1
+                const match = questionId.match(/q(\d+)/);
+                const pillarNumber = match ? Math.min(5, Math.max(1, Math.ceil(parseInt(match[1]) / 5))) : 1;
+                questionPillar = `Pillar ${pillarNumber}`;
+            } else if (questionId.startsWith('adv_q')) {
+                // Extract pillar number from advanced questions
+                const match = questionId.match(/q(\d+)/);
+                const pillarNumber = match ? Math.min(5, Math.max(1, Math.ceil(parseInt(match[1]) / 5))) : 1;
+                questionPillar = `Pillar ${pillarNumber}`;
+            }
+            
+            // Map the answer to a status
+            let status;
+            switch (answer) {
+                case 'Compliant':
+                    status = 'compliant';
+                    results.additionalQuestionsResults.compliant++;
+                    results.compliant++; // Add to overall compliance
+                    break;
+                case 'Non-Compliant':
+                    status = 'nonCompliant';
+                    results.additionalQuestionsResults.nonCompliant++;
+                    results.nonCompliant++; // Add to overall non-compliance
+                    break;
+                case 'Not Applicable':
+                    status = 'na';
+                    results.additionalQuestionsResults.na++;
+                    results.na++; // Add to overall NA count
+                    break;
+                case 'Inherited':
+                    status = 'inherited';
+                    results.additionalQuestionsResults.inherited++;
+                    results.inherited++; // Add to overall inherited count
+                    break;
+                default:
+                    status = 'nonCompliant'; // Default to non-compliant if unknown
+                    results.additionalQuestionsResults.nonCompliant++;
+                    results.nonCompliant++; // Add to overall non-compliance
+            }
+            
+            results.additionalQuestionsResults.total++;
+            results.total++; // Increment overall total
+            
+            // Update pillar breakdown if we determined which pillar this belongs to
+            if (questionPillar && results.pillarBreakdown[questionPillar]) {
+                results.pillarBreakdown[questionPillar][status]++;
+                results.pillarBreakdown[questionPillar].total++;
+            }
+            
+            // Add to details for reporting
+            const questionDetails = {
+                controlId: questionId,
+                controlName: `Additional Question ${questionId}`,
+                pillar: questionPillar ? findPillarForControl(questionPillar.replace('Pillar ', 'ZT-')) : { id: 'Unknown', name: 'Unknown' },
+                userStatus: answer,
+                required: true,
+                isGap: answer === 'Non-Compliant',
+                isAdditionalQuestion: true
+            };
+            
+            results.details.push(questionDetails);
+            
+            // Add to critical gaps if non-compliant
+            if (answer === 'Non-Compliant') {
+                results.criticalGaps.push(questionDetails);
+            }
+        });
+        
+        console.log('After including additional questions - Total:', results.total, 
+                   'Compliant:', results.compliant, 
+                   'Non-Compliant:', results.nonCompliant,
+                   'Inherited:', results.inherited,
+                   'N/A:', results.na);
+    }
+    
     // Calculate compliance percentage (Compliant + Inherited vs effective total)
     // N/A controls are excluded from the calculation
     const effectiveTotal = results.total - results.na;
@@ -1355,6 +1482,14 @@ function createComplianceChart(results) {
     const ctx = document.getElementById('complianceChart');
     if (!ctx) return;
     
+    console.log('Creating compliance chart with data:', {
+        compliant: results.compliant,
+        nonCompliant: results.nonCompliant,
+        inherited: results.inherited,
+        na: results.na,
+        total: results.total
+    });
+    
     // Destroy existing chart
     if (complianceChart) {
         complianceChart.destroy();
@@ -1418,6 +1553,8 @@ function createPillarChart(results) {
     const ctx = document.getElementById('pillarChart'); // Updated from familyChart
     if (!ctx) return;
     
+    console.log('Creating pillar chart with data:', results.pillarBreakdown);
+    
     // Destroy existing chart
     if (pillarChart) {
         pillarChart.destroy();
@@ -1427,8 +1564,13 @@ function createPillarChart(results) {
     const pillars = Object.keys(results.pillarBreakdown);
     const pillarData = pillars.map(pillarId => {
         const breakdown = results.pillarBreakdown[pillarId];
-        const compliantPercent = breakdown.total > 0 ? 
-            ((breakdown.compliant + breakdown.inherited) / breakdown.total) * 100 : 0;
+        // Make sure we're not dividing by zero
+        const effectiveTotal = breakdown.total - breakdown.na;
+        const compliantPercent = effectiveTotal > 0 ? 
+            ((breakdown.compliant + breakdown.inherited) / effectiveTotal) * 100 : 0;
+            
+        console.log(`Pillar ${pillarId} compliance: ${compliantPercent.toFixed(1)}% (${breakdown.compliant + breakdown.inherited}/${effectiveTotal})`);
+            
         return {
             pillarId: pillarId,
             pillarName: `${pillarId}: ${breakdown.name}`,
@@ -1437,39 +1579,51 @@ function createPillarChart(results) {
             inherited: breakdown.inherited,
             na: breakdown.na,
             total: breakdown.total,
+            effectiveTotal: effectiveTotal,
             compliancePercent: compliantPercent
         };
     });
 
+    // Filter out pillars with no controls (total = 0)
+    const filteredPillarData = pillarData.filter(p => p.total > 0);
+    
     // Sort by pillar ID to maintain consistent order
-    pillarData.sort((a, b) => a.pillarId.localeCompare(b.pillarId));
+    filteredPillarData.sort((a, b) => a.pillarId.localeCompare(b.pillarId));
+    
+    console.log('Filtered pillar data for chart:', filteredPillarData.length, 'pillars');
+    
+    // If we don't have any pillar data, return early
+    if (filteredPillarData.length === 0) {
+        console.error('No pillar data available for chart');
+        return;
+    }
 
     pillarChart = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
-            labels: pillarData.map(item => item.pillarName),
+            labels: filteredPillarData.map(item => item.pillarName),
             datasets: [
                 {
                     label: 'Compliant',
-                    data: pillarData.map(item => item.compliant),
+                    data: filteredPillarData.map(item => item.compliant),
                     backgroundColor: '#28a745',
                     borderWidth: 1
                 },
                 {
                     label: 'Inherited',
-                    data: pillarData.map(item => item.inherited),
+                    data: filteredPillarData.map(item => item.inherited),
                     backgroundColor: '#17a2b8',
                     borderWidth: 1
                 },
                 {
                     label: 'Non-Compliant',
-                    data: pillarData.map(item => item.nonCompliant),
+                    data: filteredPillarData.map(item => item.nonCompliant),
                     backgroundColor: '#dc3545',
                     borderWidth: 1
                 },
                 {
                     label: 'N/A',
-                    data: pillarData.map(item => item.na),
+                    data: filteredPillarData.map(item => item.na),
                     backgroundColor: '#6c757d',
                     borderWidth: 1
                 }
@@ -1507,8 +1661,8 @@ function createPillarChart(results) {
                     callbacks: {
                         footer: function(tooltipItems) {
                             const index = tooltipItems[0].dataIndex;
-                            const item = pillarData[index];
-                            return `Overall: ${item.compliancePercent.toFixed(1)}% compliant`;
+                            const item = filteredPillarData[index];
+                            return `Overall: ${item.compliancePercent.toFixed(1)}% compliant (${item.compliant + item.inherited}/${item.effectiveTotal})`;
                         }
                     }
                 }
@@ -1638,8 +1792,9 @@ function getStatusIcon(status) {
 
 // Function to find which pillar a control belongs to
 function findPillarForControl(controlId) {
+    // Loop through all pillars and check if the control is in the pillar's control list
     for (const pillarId in ZT_PILLARS) {
-        if (ZT_PILLARS[pillarId].controls.includes(controlId)) {
+        if (ZT_PILLARS[pillarId].controls && ZT_PILLARS[pillarId].controls.includes(controlId)) {
             return {
                 id: pillarId,
                 name: ZT_PILLARS[pillarId].name
@@ -1647,10 +1802,24 @@ function findPillarForControl(controlId) {
         }
     }
     
-    // Default to Pillar 7 (Visibility & Analytics) if not found
+    // If not found in any pillar, determine the pillar based on control ID prefix
+    // ZT-1.x.x belongs to Pillar 1, ZT-2.x.x to Pillar 2, etc.
+    if (controlId.startsWith('ZT-')) {
+        const pillarNumber = parseInt(controlId.split('-')[1].split('.')[0]);
+        const pillarId = `Pillar ${pillarNumber}`;
+        
+        if (ZT_PILLARS[pillarId]) {
+            return {
+                id: pillarId,
+                name: ZT_PILLARS[pillarId].name
+            };
+        }
+    }
+    
+    // Default to Pillar 5 (Network & Environment) if not found - this is a more likely default than Pillar 7
     return {
-        id: 'Pillar 7',
-        name: ZT_PILLARS['Pillar 7'].name
+        id: 'Pillar 5',
+        name: ZT_PILLARS['Pillar 5'].name
     };
 }
 
