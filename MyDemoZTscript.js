@@ -1386,18 +1386,12 @@ function handleFileUpload(event) {
                         <div class="file-success">
                             <div>✅ File loaded successfully: <strong>${file.name}</strong></div>
                             <div>${uploadedData.length} control(s) found</div>
-                            <button id="reviewControlsBtn" class="btn btn-secondary">Review & Adjust Controls</button>
                         </div>
                     `;
                     fileInfo.style.display = 'block';
                     
-                    // Add event listener to the review button
-                    const reviewBtn = document.getElementById('reviewControlsBtn');
-                    if (reviewBtn) {
-                        reviewBtn.addEventListener('click', function() {
-                            populateAdjustableControls();
-                        });
-                    }
+                    // Automatically call the function that was previously linked to the button
+                    populateAdjustableControls();
                 }
                 
                 // Ensure form state is updated
