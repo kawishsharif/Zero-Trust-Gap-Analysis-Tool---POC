@@ -1744,12 +1744,12 @@ function renderAdditionalQuestions(questions) {
         `;
     });
     
-    // Add a Process button to directly proceed to processing
-    html += `
-        <div class="form-actions" style="margin-top: 30px;">
-            <button id="proceedToAdjustBtn" class="btn btn-primary">Process Assessment</button>
-        </div>
-    `;
+    // // Add a Process button to directly proceed to processing
+    // html += `
+    //     <div class="form-actions" style="margin-top: 30px;">
+    //         <button id="proceedToAdjustBtn" class="btn btn-primary">Process Assessment</button>
+    //     </div>
+    // `;
     
     additionalQuestions.innerHTML = html;
     
