@@ -549,64 +549,63 @@ function handleFileDrop(event) {
 }
 
 function handleFileUpload(event) {
-    const file = event.target?.files?.[0] || (event.dataTransfer?.files?.[0]);
+    const file = event.target ? event.target.files[0] : event.dataTransfer.files[0];
     
     if (!file) {
-        showError('No file selected.');
+        showError('No file selected');
         return;
     }
-    
+
     if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-        showError('Please upload a valid CSV file.');
+        showError('Please select a CSV file');
         return;
     }
-    
+
     const reader = new FileReader();
-    
     reader.onload = function(e) {
         try {
-            const csvContent = e.target.result;
-            uploadedData = parseCSV(csvContent);
+            const csv = e.target.result;
+            const parsedData = parseCSV(csv);
             
-            if (uploadedData && uploadedData.length > 0) {
-                // Display file info
-                const fileInfo = document.getElementById('fileInfo');
-                if (fileInfo) {
-                    fileInfo.innerHTML = `
-                        <div class="file-success">
-                            <div>✅ File loaded successfully: <strong>${file.name}</strong></div>
-                            <div>${uploadedData.length} control(s) found</div>
-                            <button id="reviewControlsBtn" class="btn btn-secondary">Review & Adjust Controls</button>
-                        </div>
-                    `;
-                    fileInfo.style.display = 'block';
-                    
-                    // Add event listener to the review button
-                    const reviewBtn = document.getElementById('reviewControlsBtn');
-                    if (reviewBtn) {
-                        reviewBtn.addEventListener('click', function() {
-                            populateAdjustableControls();
-                        });
-                    }
-                }
-                
-                // Ensure form state is updated
-                checkFormReady();
-                
-                // Update additional questions based on overlay selection
-                updateAdditionalQuestions();
-                
-            } else {
-                showError('No valid data found in the CSV file.');
+            if (parsedData.length === 0) {
+                showError('No data found in the CSV file');
+                return;
             }
-        } catch (err) {
-            console.error('Error parsing CSV:', err);
-            showError('Error parsing CSV file: ' + err.message);
+            
+            // Store the uploaded data for processing
+            uploadedData = parsedData;
+            
+            // Display file info
+            const fileInfo = document.getElementById('fileInfo');
+            if (fileInfo) {
+                fileInfo.innerHTML = `
+                    <div class="file-success">
+                        <div class="success-icon">✓</div>
+                        <div class="file-details">
+                            <p><strong>${file.name}</strong> successfully processed!</p>
+                            <p>${parsedData.length} controls found</p>
+                        </div>
+                    </div>
+                `;
+                fileInfo.style.display = 'block';
+            }
+            
+            // Show the additional questions step if needed
+            updateAdditionalQuestions();
+            
+            // Skip the adjustment controls step - removed as per client request
+            
+            // Check if form is ready to submit
+            checkFormReady();
+            
+        } catch (error) {
+            console.error('Error processing CSV:', error);
+            showError(`Error processing CSV: ${error.message}`);
         }
     };
     
     reader.onerror = function() {
-        showError('Error reading file.');
+        showError('Error reading the file');
     };
     
     reader.readAsText(file);
@@ -678,245 +677,25 @@ function normalizeStatus(status) {
     return 'Non-compliant';
 }
 
-// Function to show and populate the adjustment step
-function populateAdjustableControls() {
-    const adjustAnswersStep = document.getElementById('adjustAnswersStep');
-    const adjustableControls = document.getElementById('adjustableControls');
-    
-    if (!adjustAnswersStep || !adjustableControls || !uploadedData || uploadedData.length === 0) {
-        showError('No data available for adjustment');
-        return;
-    }
-    
-    // Show the adjustment step
-    adjustAnswersStep.style.display = 'block';
-    adjustAnswersStep.scrollIntoView({ behavior: 'smooth' });
-    
-    // Get selected overlay type
-    const overlay = document.querySelector('input[name="overlay"]:checked')?.value;
-    if (!overlay) {
-        showError('Please select a Zero Trust Control Type');
-        return;
-    }
-    
-    const overlayControls = ZT_OVERLAYS[overlay];
-    
-    // Keep track of adjusted data
-    if (!window.adjustedData) {
-        window.adjustedData = JSON.parse(JSON.stringify(uploadedData));
-        // Store original status for comparison
-        window.adjustedData.forEach(item => {
-            item.originalStatus = item.status;
-        });
-    }
-    
-    // Initialize comments object if it doesn't exist
-    if (!window.adjustmentComments) {
-        window.adjustmentComments = {};
-    }
-    
-    // Populate controls for adjustment
-    populateAdjustableControlsList('all');
-    
-    // Add event listener to filter controls dropdown
-    const filterControls = document.getElementById('filterControls');
-    if (filterControls) {
-        filterControls.addEventListener('change', function() {
-            populateAdjustableControlsList(this.value);
-        });
-    }
-    
-    // Add event listener to save button
-    const saveAdjustmentsBtn = document.getElementById('saveAdjustmentsBtn');
-    if (saveAdjustmentsBtn) {
-        saveAdjustmentsBtn.addEventListener('click', saveAdjustments);
-    }
-}
-
-// Function to populate and display adjustable controls based on filter
-function populateAdjustableControlsList(filter) {
-    const adjustableControls = document.getElementById('adjustableControls');
-    if (!adjustableControls || !window.adjustedData) return;
-    
-    // Get selected overlay type
-    const overlay = document.querySelector('input[name="overlay"]:checked')?.value;
-    if (!overlay) return;
-    
-    const overlayControls = ZT_OVERLAYS[overlay];
-    
-    // Filter controls based on selected filter
-    let filteredControls = [...window.adjustedData];
-    
-    switch (filter) {
-        case 'compliant':
-            filteredControls = filteredControls.filter(control => control.status === 'Compliant');
-            break;
-        case 'non-compliant':
-            filteredControls = filteredControls.filter(control => control.status === 'Non-compliant');
-            break;
-        case 'inherited':
-            filteredControls = filteredControls.filter(control => control.status === 'Inherited');
-            break;
-        case 'na':
-            filteredControls = filteredControls.filter(control => control.status === 'N/A');
-            break;
-        default:
-            // All controls, no filtering
-            break;
-    }
-    
-    // Sort controls alphabetically by ID
-    filteredControls.sort((a, b) => a.controlId.localeCompare(b.controlId));
-    
-    // Generate HTML for controls
-    let html = '';
-    
-    if (filteredControls.length === 0) {
-        html = '<p class="info-text">No controls match the selected filter.</p>';
-    } else {
-        filteredControls.forEach(control => {
-            const controlInfo = overlayControls[control.controlId];
-            const controlName = controlInfo ? controlInfo.name : 'Unknown Control';
-            const controlFamily = controlInfo ? controlInfo.family : 'Uncategorized';
-            const controlId = control.controlId;
-            const currentStatus = control.status;
-            const comment = window.adjustmentComments[controlId] || '';
-            
-            html += `
-                <div class="adjustable-control" data-control-id="${controlId}">
-                    <div class="control-header">
-                        <span class="control-id">${controlId}</span>
-                        <span class="control-name">${controlName}</span>
-                        <span class="control-family">${controlFamily}</span>
-                    </div>
-                    <div class="control-body">
-                        <div class="status-group">
-                            <label>Status:</label>
-                            <select class="status-select" data-control-id="${controlId}">
-                                <option value="Compliant" ${currentStatus === 'Compliant' ? 'selected' : ''}>Compliant</option>
-                                <option value="Non-compliant" ${currentStatus === 'Non-compliant' ? 'selected' : ''}>Non-compliant</option>
-                                <option value="Inherited" ${currentStatus === 'Inherited' ? 'selected' : ''}>Inherited</option>
-                                <option value="N/A" ${currentStatus === 'N/A' ? 'selected' : ''}>N/A</option>
-                            </select>
-                            <div class="status-info ${control.originalStatus !== control.status ? 'modified' : ''}"> 
-                                ${control.originalStatus !== control.status ? 
-                                `<span class="original-status">Original: ${control.originalStatus}</span>` : 
-                                ''}
-                            </div>
-                        </div>
-                        <div class="comment-group">
-                            <label for="comment-${controlId}">Justification:</label>
-                            <textarea id="comment-${controlId}" 
-                                      data-control-id="${controlId}" 
-                                      class="comment-input" 
-                                      placeholder="Enter justification for any status changes...">${comment}</textarea>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    adjustableControls.innerHTML = html;
-    
-    // Add event listeners to status selects
-    const statusSelects = adjustableControls.querySelectorAll('.status-select');
-    statusSelects.forEach(select => {
-        select.addEventListener('change', function() {
-            const controlId = this.dataset.controlId;
-            const newStatus = this.value;
-            
-            // Update status in adjustedData
-            const controlData = window.adjustedData.find(item => item.controlId === controlId);
-            if (controlData) {
-                controlData.status = newStatus;
-            }
-            
-            // Update status-info display
-            const statusInfo = this.parentElement.querySelector('.status-info');
-            if (statusInfo) {
-                if (controlData && controlData.originalStatus !== newStatus) {
-                    statusInfo.innerHTML = `<span class="original-status">Original: ${controlData.originalStatus}</span>`;
-                    statusInfo.classList.add('modified');
-                } else {
-                    statusInfo.innerHTML = '';
-                    statusInfo.classList.remove('modified');
-                }
-            }
-        });
-    });
-    
-    // Add event listeners to comment inputs
-    const commentInputs = adjustableControls.querySelectorAll('.comment-input');
-    commentInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            const controlId = this.dataset.controlId;
-            window.adjustmentComments[controlId] = this.value;
-        });
-    });
-}
-
-// Function to save adjustments and proceed to the next step
-function saveAdjustments() {
-    if (!window.adjustedData) {
-        showError('No adjustments to save');
-        return;
-    }
-    
-    // Update uploadedData with adjusted data
-    uploadedData = [...window.adjustedData];
-    
-    // Store comments for later use (could be used in exports)
-    window.savedComments = {...window.adjustmentComments};
-    
-    // Set flag that adjustments have been applied
-    window.adjustmentsApplied = true;
-    
-    // Show success message
-    showSuccess('Adjustments saved successfully!');
-    
-    // Enable the process button
-    const processBtn = document.getElementById('processBtn');
-    if (processBtn) {
-        processBtn.disabled = false;
-    }
-    
-    // Smooth scroll to the process step
-    const processStep = document.getElementById('processStepTitle');
-    if (processStep) {
-        processStep.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-// Zero Trust Gap Analysis Tool - Part 2: Processing and Analysis
-// Based on provided Project.xlsx specifications
-
 // ===========================================
 // ADDITIONAL QUESTIONS HANDLING
 // ===========================================
 
 function updateAdditionalQuestions() {
-    const selectedOverlay = document.querySelector('input[name="overlay"]:checked');
+    const overlay = document.querySelector('input[name="overlay"]:checked')?.value;
     const additionalQuestionsStep = document.getElementById('additionalQuestionsStep');
-    const adjustAnswersStep = document.getElementById('adjustAnswersStep');
-    const processStepTitle = document.getElementById('processStepTitle');
     
-    if (!selectedOverlay) {
-        if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'none';
-        if (adjustAnswersStep) adjustAnswersStep.style.display = 'none';
-        if (processStepTitle) processStepTitle.textContent = 'Step 4: Process Assessment';
-        return;
-    }
-
-    const overlayType = selectedOverlay.value;
-    const questions = ADDITIONAL_QUESTIONS[overlayType];
+    // Hide by default
+    if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'none';
     
-    if (questions && questions.length > 0) {
-        if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'block';
-        if (processStepTitle) processStepTitle.textContent = 'Step 6: Process Assessment';
+    if (!overlay || !uploadedData || uploadedData.length === 0) return;
+    
+    // Show additional questions based on selected overlay
+    const questions = ADDITIONAL_QUESTIONS[overlay] || [];
+    
+    if (questions.length > 0 && additionalQuestionsStep) {
+        additionalQuestionsStep.style.display = 'block';
         renderAdditionalQuestions(questions);
-    } else {
-        if (additionalQuestionsStep) additionalQuestionsStep.style.display = 'none';
-        if (processStepTitle) processStepTitle.textContent = 'Step 5: Process Assessment';
     }
 }
 
@@ -977,7 +756,7 @@ function renderAdditionalQuestions(questions) {
             }
             
             // Proceed to adjustment step
-            populateAdjustableControls();
+            // Removed as per client request
         });
     }
 }
@@ -987,44 +766,41 @@ function renderAdditionalQuestions(questions) {
 // ===========================================
 
 function checkFormReady() {
-    const agencySelect = document.getElementById('agencySelect');
-    const agency = agencySelect ? agencySelect.value : '';
-    const overlay = document.querySelector('input[name="overlay"]:checked');
-    const hasFile = uploadedData !== null;
-    
-    // Check if additional questions are answered (if visible)
-    let additionalQuestionsAnswered = true;
-    const additionalQuestionsStep = document.getElementById('additionalQuestionsStep');
-    if (additionalQuestionsStep && additionalQuestionsStep.style.display !== 'none' && overlay) {
-        const questions = ADDITIONAL_QUESTIONS[overlay.value] || [];
-        additionalQuestionsAnswered = questions.every(q => additionalAnswers[q.id]);
-    }
-    
-    // If adjustments have been applied, override other conditions
-    let isReady = agency && overlay && hasFile && additionalQuestionsAnswered;
-    if (window.adjustmentsApplied) {
-        isReady = true;
-    }
-    
     const processBtn = document.getElementById('processBtn');
-    if (processBtn) processBtn.disabled = !isReady;
+    const agencySelect = document.getElementById('agencySelect');
+    const overlayOptions = document.querySelectorAll('input[name="overlay"]');
+    const csvFile = document.getElementById('csvFile');
     
-    // Update button text based on readiness
-    const btnText = document.getElementById('btnText');
-    if (btnText) {
-        if (!agency) {
-            btnText.textContent = '⚠️ Select Agency';
-        } else if (!overlay) {
-            btnText.textContent = '⚠️ Select Control Type';
-        } else if (!hasFile) {
-            btnText.textContent = '⚠️ Upload CSV File';
-        } else if (!additionalQuestionsAnswered && !window.adjustmentsApplied) {
-            btnText.textContent = '⚠️ Answer Additional Questions';
-        } else if (window.adjustmentsApplied) {
-            btnText.textContent = '🔄 Process Assessment';
-        } else {
-            btnText.textContent = '⚠️ Review & Adjust Controls';
+    let agencySelected = false;
+    let overlaySelected = false;
+    let fileUploaded = false;
+    
+    // Check if agency is selected
+    if (agencySelect && agencySelect.value) {
+        agencySelected = true;
+    }
+    
+    // Check if overlay is selected
+    overlayOptions.forEach(option => {
+        if (option.checked) {
+            overlaySelected = true;
         }
+    });
+    
+    // Check if file is uploaded
+    if (uploadedData && uploadedData.length > 0) {
+        fileUploaded = true;
+    }
+    
+    // Update process button state
+    if (processBtn) {
+        const ready = agencySelected && overlaySelected && fileUploaded;
+        processBtn.disabled = !ready;
+        
+        // Update button text based on state
+        document.getElementById('btnText').innerText = ready ? 
+            '🔄 Process Assessment' : 
+            'Complete All Steps to Continue';
     }
 }
 
@@ -1057,8 +833,8 @@ function processAssessment() {
             const overlay = document.querySelector('input[name="overlay"]:checked').value;
             const overlayControls = ZT_OVERLAYS[overlay];
             
-            // Use adjusted data if available, otherwise use the original upload data
-            const dataToProcess = window.adjustedData || uploadedData;
+            // Use uploaded data directly, no adjustments
+            const dataToProcess = uploadedData;
             
             processedResults = analyzeCompliance(dataToProcess, overlayControls, overlay);
             
@@ -1092,14 +868,13 @@ function analyzeCompliance(data, overlayControls, overlayType) {
         nonCompliant: 0,
         inherited: 0,
         na: 0,
-        // Initialize pillar breakdown instead of family breakdown
         pillarBreakdown: {},
-        details: [], // Initialize details array
-        criticalGaps: [], // Initialize criticalGaps array
+        details: [],
+        criticalGaps: [],
         additionalAnswers: additionalAnswers,
         date: new Date().toLocaleDateString(),
         agency: document.getElementById('agencySelect').value || 'Unknown',
-        adjustmentComments: window.savedComments || {}
+        adjustmentComments: {}
     };
     
     // Initialize pillar breakdown structure
@@ -1166,8 +941,22 @@ function analyzeCompliance(data, overlayControls, overlayType) {
         userRMFControls[item.controlId] = item;
     });
     
-    // First, process each Zero Trust control based on its associated RMF controls
-    Object.keys(ZT_TO_RMF_MAPPING).forEach(ztControlId => {
+    // First, determine which controls to process based on the overlay type
+    const ztControlsToProcess = Object.keys(ZT_TO_RMF_MAPPING).filter(ztControlId => {
+        // For target overlay, only include basic controls (not advanced specific)
+        if (overlayType === 'target') {
+            // Exclude any advanced-only controls (prefixed with ZT-1.4, ZT-2.3, etc.)
+            return !['ZT-1.4', 'ZT-2.3', 'ZT-3.3', 'ZT-5.2'].some(prefix => 
+                ztControlId.startsWith(prefix));
+        }
+        // For advanced overlay, include all controls
+        return true;
+    });
+    
+    console.log(`Processing ${ztControlsToProcess.length} ZT controls for ${overlayType} overlay`);
+    
+    // Process each applicable Zero Trust control based on its associated RMF controls
+    ztControlsToProcess.forEach(ztControlId => {
         const associatedRMFControls = ZT_TO_RMF_MAPPING[ztControlId];
         let ztControlStatus = 'Compliant'; // Start assuming compliant
         let totalAssociatedControls = 0;
@@ -1400,6 +1189,7 @@ function analyzeCompliance(data, overlayControls, overlayType) {
 
     return results;
 }
+
 // ===========================================
 // RESULTS DISPLAY
 // ===========================================
@@ -1892,8 +1682,6 @@ function showSuccess(message) {
         }
     }, 3000);
 }
-// Zero Trust Gap Analysis Tool - Part 3: Export Functionality and Final Integration
-// Based on provided Project.xlsx specifications
 
 // ===========================================
 // EXPORT FUNCTIONALITY (5 CSV Files + HTML Charts as per requirements)
