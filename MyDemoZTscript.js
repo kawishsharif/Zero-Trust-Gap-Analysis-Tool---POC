@@ -1868,7 +1868,8 @@ function processAssessment() {
             const results = document.getElementById('results');
             if (results) {
                 results.style.display = 'block';
-                results.scrollIntoView({ behavior: 'smooth' });
+                // Removed automatic scrolling to prevent unexpected page jumping
+                // results.scrollIntoView({ behavior: 'smooth' });
             }
             
         } catch (err) {
@@ -2134,8 +2135,8 @@ function analyzeCompliance(data, overlayControls, overlayType) {
             }
         });
         
-        // If all associated controls are N/A, mark the ZT control as N/A
-        if (totalAssociatedControls === 0 && naCount > 0) {
+        // If ANY associated control is N/A, mark the ZT control as N/A
+        if (naCount > 0) {
             ztControlStatus = 'N/A';
         }
         
